@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Nomad Chats</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%2300a884%22/><text x=%2250%22 y=%2268%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22>N</text></svg>">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="brand-logo">N</div>
+      <h1 data-i18n="app_name">Nomad Chats</h1>
+      <p data-i18n="tagline">Simple. Secure. Reliable messaging.</p>
+    </div>
+
+    <div class="auth-lang-switch">
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+    </div>
+
+    <div class="auth-tabs">
+      <button id="tab-login" class="auth-tab active" data-i18n="login">Log in</button>
+      <button id="tab-register" class="auth-tab" data-i18n="register">Sign up</button>
+    </div>
+
+    <form id="login-form" class="auth-form">
+      <input type="text" id="login-username" data-i18n-placeholder="username" placeholder="Username" autocomplete="username" required>
+      <input type="password" id="login-password" data-i18n-placeholder="password" placeholder="Password" autocomplete="current-password" required>
+      <div class="auth-error" id="login-error"></div>
+      <button type="submit" class="btn-primary" data-i18n="login_cta">Log in</button>
+    </form>
+
+    <form id="register-form" class="auth-form hidden">
+      <input type="text" id="register-displayname" data-i18n-placeholder="display_name" placeholder="Your name" autocomplete="name" required>
+      <input type="text" id="register-username" data-i18n-placeholder="username" placeholder="Username" autocomplete="username" required>
+      <input type="password" id="register-password" data-i18n-placeholder="password" placeholder="Password" autocomplete="new-password" required>
+      <div class="auth-error" id="register-error"></div>
+      <button type="submit" class="btn-primary" data-i18n="register_cta">Create account</button>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-screen" class="app-screen hidden">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img id="my-avatar" class="avatar avatar-sm" src="" alt="">
+      <div class="sidebar-header-actions">
+        <button class="icon-btn" id="btn-new-chat" title="New chat" data-icon="chat"></button>
+        <button class="icon-btn" id="btn-new-group" title="New group" data-icon="users"></button>
+        <button class="icon-btn" id="btn-profile" title="Profile" data-icon="settings"></button>
+        <div class="lang-switch-inline">
+          <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+          <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="chat-search" data-i18n-placeholder="search_or_start" placeholder="Search or start new chat">
+    </div>
+    <div class="chat-list" id="chat-list"></div>
+  </aside>
+
+  <main class="chat-main">
+    <div id="empty-state" class="empty-state">
+      <div class="empty-illustration" data-icon="chat" data-icon-size="72"></div>
+      <h2 data-i18n="no_chat_selected">Select a chat to start messaging</h2>
+      <p data-i18n="no_chat_sub">Your messages sync across your devices.</p>
+    </div>
+
+    <div id="chat-view" class="chat-view hidden">
+      <div class="chat-header">
+        <img id="chat-avatar" class="avatar avatar-sm" src="" alt="">
+        <div class="chat-header-info">
+          <div id="chat-title" class="chat-title"></div>
+          <div id="chat-subtitle" class="chat-subtitle"></div>
+        </div>
+        <div class="chat-header-actions">
+          <button class="icon-btn" id="btn-voice-call" title="Voice call" data-icon="phone"></button>
+          <button class="icon-btn" id="btn-video-call" title="Video call" data-icon="video"></button>
+          <button class="icon-btn" id="btn-chat-info" title="Info" data-icon="info"></button>
+        </div>
+      </div>
+      <div class="messages" id="messages"></div>
+      <form class="composer" id="composer">
+        <button type="button" class="icon-btn" id="btn-attach" title="Attach" data-icon="paperclip"></button>
+        <input type="file" id="file-input" accept="image/*,.pdf,.txt,.zip,.doc,.docx" hidden>
+        <input type="text" id="message-input" data-i18n-placeholder="type_message" placeholder="Type a message" autocomplete="off">
+        <button type="submit" class="icon-btn send-btn" title="Send" data-icon="send"></button>
+      </form>
+    </div>
+  </main>
+
+  <aside id="info-panel" class="info-panel hidden">
+    <div class="info-panel-header">
+      <button class="icon-btn" id="btn-close-info" data-icon="x"></button>
+      <span data-i18n="group_info">Group info</span>
+    </div>
+    <div class="info-panel-body" id="info-panel-body"></div>
+  </aside>
+</div>
+
+<!-- NEW CHAT MODAL -->
+<div id="modal-new-chat" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 data-i18n="new_chat">New chat</h3>
+      <button class="icon-btn" data-close-modal data-icon="x"></button>
+    </div>
+    <input type="text" id="new-chat-search" data-i18n-placeholder="search_users" placeholder="Search by username…" class="modal-search">
+    <div class="user-list" id="new-chat-results"></div>
+  </div>
+</div>
+
+<!-- NEW GROUP MODAL -->
+<div id="modal-new-group" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 data-i18n="new_group">New group</h3>
+      <button class="icon-btn" data-close-modal data-icon="x"></button>
+    </div>
+    <input type="text" id="new-group-name" data-i18n-placeholder="group_name" placeholder="Group name" class="modal-search">
+    <input type="text" id="new-group-search" data-i18n-placeholder="search_users" placeholder="Search by username…" class="modal-search">
+    <div class="chip-list" id="new-group-selected"></div>
+    <div class="user-list" id="new-group-results"></div>
+    <button class="btn-primary" id="btn-create-group" data-i18n="create_group">Create group</button>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="modal-profile" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 data-i18n="profile">Profile</h3>
+      <button class="icon-btn" data-close-modal data-icon="x"></button>
+    </div>
+    <div class="profile-avatar-row">
+      <img id="profile-avatar-preview" class="avatar avatar-lg" src="" alt="">
+      <input type="file" id="profile-avatar-input" accept="image/*" hidden>
+      <button class="btn-secondary btn-icon-label" id="btn-change-avatar"><span data-icon="camera" data-icon-size="16"></span><span data-i18n="attach">Change photo</span></button>
+    </div>
+    <label data-i18n="display_name">Your name</label>
+    <input type="text" id="profile-displayname" class="modal-search">
+    <label data-i18n="status">About</label>
+    <input type="text" id="profile-status" class="modal-search">
+    <button class="btn-primary" id="btn-save-profile" data-i18n="save">Save</button>
+    <button class="btn-secondary btn-icon-label" id="btn-logout"><span data-icon="logout" data-icon-size="16"></span><span data-i18n="logout">Log out</span></button>
+  </div>
+</div>
+
+<!-- CALL OVERLAY -->
+<div id="call-overlay" class="call-overlay hidden">
+  <div class="call-content">
+    <img id="call-avatar" class="avatar avatar-xl" src="" alt="">
+    <div id="call-name" class="call-name"></div>
+    <div id="call-status" class="call-status"></div>
+    <div class="call-video-grid" id="call-video-grid"></div>
+    <div class="call-actions" id="call-actions"></div>
+  </div>
+</div>
+
+<audio id="ringtone" loop src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/icons.js"></script>
+<script src="/js/i18n.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/webrtc.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

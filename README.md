@@ -1,97 +1,72 @@
-# 🌍 KidWorld
+# Nomad Chats
 
-A fun learning platform for Year 1 & 2 students — Maths, English and Russian.
+A WhatsApp-style messenger: 1:1 and group chats, image/file sharing, and WebRTC voice/video calls (including group calls). UI available in English and Russian.
 
----
+## Features
 
-## 🚀 How to Run (Local)
+- **Accounts** — register with username + password, sessions persist across visits via a secure cookie (stays logged in on that device).
+- **Direct & group chats** — real-time messaging over Socket.io, typing indicators, online/last-seen presence, unread counts.
+- **Groups** — create groups, add/remove members, admin roles, group avatar/name.
+- **Media sharing** — send images and files (PDF, docs, zip, txt) in any chat.
+- **Calls** — WebRTC voice and video calls, 1:1 and full-mesh group calls, signaled over Socket.io (STUN only, no external TURN service configured).
+- **Languages** — English and Russian, switchable from the login screen or inside the app; each user's choice is saved to their profile.
 
-### Windows
-1. Make sure [Python](https://www.python.org/downloads/) is installed  
-   *(tick "Add Python to PATH" during install)*
-2. Double-click **`start.bat`**
-3. KidWorld opens at **http://localhost:5000** automatically
+## Running locally
 
-### Mac / Linux
-1. Make sure Python 3 is installed
-2. Open Terminal in this folder
-3. Run: `chmod +x start.sh && ./start.sh`
-4. KidWorld opens at **http://localhost:5000** automatically
-
-### Manual start (any OS)
 ```bash
-pip install flask
-python server.py
-```
-Then open **http://localhost:5000**
-
----
-
-## 🌐 Pages
-
-| URL | Who | What |
-|-----|-----|------|
-| `/` | Everyone | Landing page |
-| `/student.html` | Students | Full learning app |
-| `/teacher.html` | Teacher | Dashboard (password: `teach2024`) |
-
----
-
-## 🎮 What's Inside
-
-### Student App
-- 5-step onboarding (name, language 🇬🇧/🇷🇺, year, background)
-- Full Year 1 & 2 curriculum: Maths, English, Russian
-- **Maths → Summary tab**: Number bonds, times tables, fractions, shapes (Year-specific)
-- Language Lab: EN ↔ RU flashcards + translation quiz
-- 12 playable games
-- 6 subject quizzes (auto-advance, no Next button)
-- Teacher forms & quizzes (students answer in-app)
-- Full Russian UI when Russian is selected
-
-### Teacher Dashboard (password: `teach2024`)
-- Post announcements (Normal / Urgent / Fun)
-- Set homework (subject, year group, due date, points)
-- **Google Form-style form builder**: Multiple choice, Text, Rating (1–5⭐), Yes/No
-- **Quiz builder**: Same as forms but with correct answers marked
-- Results dashboard with bar charts and per-student responses
-- Live actions: 🪩 Disco, 🎊 Party, ⭐ Star Rain
-- Student leaderboard & star rewards
-
----
-
-## ☁️ Deploy to Railway (free hosting)
-
-1. Push this folder to a GitHub repo (files at root level)
-2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
-3. Pick your repo — Railway auto-detects Python
-4. Settings → Networking → Generate Domain
-5. Share `yourdomain.railway.app` with students and parents!
-
----
-
-## 📁 File Structure
-
-```
-KidWorld/
-├── server.py          ← Python web server (Flask)
-├── requirements.txt   ← Python packages needed
-├── Procfile           ← For Railway deployment
-├── start.bat          ← Windows launcher (double-click!)
-├── start.sh           ← Mac/Linux launcher
-├── README.md          ← This file
-└── static/
-    ├── index.html     ← Landing page
-    ├── student.html   ← Student app
-    └── teacher.html   ← Teacher dashboard
+npm install
+npm start
 ```
 
----
+Then open **http://localhost:3000**.
 
-## 🔑 Teacher Password
-Default: **`teach2024`**  
-To change it, edit line 7 in `server.py`:
-```python
-# No password in server.py - it's checked in teacher.html
+Data is stored in a local SQLite database at `data/nexchat.db` (created automatically). Uploaded images/files are stored in `data/uploads/`. The whole `data/` folder is gitignored — safe to delete to reset all data.
+
+## Deploying (Fly.io)
+
+The app ships with a `Dockerfile` and `fly.toml` so it can run as a single persistent Fly machine — a mounted volume keeps the SQLite database and uploaded images across restarts/redeploys.
+
+```bash
+# 1. Install the Fly CLI and log in (opens a browser)
+curl -L https://fly.io/install.sh | sh
+fly auth login
+
+# 2. Create the app (pick a globally-unique name) and the persistent volume
+fly launch --no-deploy --copy-config --name your-unique-name --region iad
+fly volumes create nexchat_data --size 1 --region iad
+
+# 3. Deploy
+fly deploy
 ```
-Search for `teach2024` in `teacher.html` and change it.
+
+Fly prints your public URL (`https://your-unique-name.fly.dev`) when the deploy finishes.
+
+**Important**: this app uses one SQLite file on disk, so it must run as exactly one machine — do not scale it horizontally (`min_machines_running` is already pinned to `1` in `fly.toml`). Note also that calls only use public STUN servers (see below), so a small fraction of users on very restrictive networks may not be able to connect calls to each other, though chat/images/groups are unaffected.
+
+## Tech stack
+
+- **Backend**: Node.js, Express, Socket.io, better-sqlite3, JWT (httpOnly cookie sessions), bcryptjs, multer (uploads)
+- **Frontend**: Vanilla HTML/CSS/JS (no build step), native WebRTC APIs
+
+## Project layout
+
+```
+server.js          Express app + Socket.io (realtime messaging, presence, WebRTC signaling)
+db.js               SQLite schema/connection
+auth.js              JWT cookie session helpers
+routes/
+  auth.js            register/login/logout/me/profile/user search
+  chats.js            conversations, groups, members, message history
+  upload.js           image/file upload endpoint
+public/
+  index.html          app shell (auth screen, chat UI, modals, call overlay)
+  css/style.css        WhatsApp-style UI, light + dark theme
+  js/i18n.js            EN/RU translation dictionary
+  js/api.js             REST client
+  js/webrtc.js           WebRTC call manager (mesh signaling for groups)
+  js/app.js              UI logic, state, socket wiring
+```
+
+## Notes on calls
+
+Calls use only public STUN servers for NAT traversal. On restrictive corporate/mobile networks that block peer-to-peer UDP, a TURN relay would be needed — none is configured here since it typically requires a paid or self-hosted relay service.
