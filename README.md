@@ -20,7 +20,28 @@ npm start
 
 Then open **http://localhost:3000**.
 
-Data is stored in a local SQLite database at `data/nexchat.db` (created automatically). Uploaded images/files are stored in `uploads/`. Both are gitignored — safe to delete to reset all data.
+Data is stored in a local SQLite database at `data/nexchat.db` (created automatically). Uploaded images/files are stored in `data/uploads/`. The whole `data/` folder is gitignored — safe to delete to reset all data.
+
+## Deploying (Fly.io)
+
+The app ships with a `Dockerfile` and `fly.toml` so it can run as a single persistent Fly machine — a mounted volume keeps the SQLite database and uploaded images across restarts/redeploys.
+
+```bash
+# 1. Install the Fly CLI and log in (opens a browser)
+curl -L https://fly.io/install.sh | sh
+fly auth login
+
+# 2. Create the app (pick a globally-unique name) and the persistent volume
+fly launch --no-deploy --copy-config --name your-unique-name --region iad
+fly volumes create nexchat_data --size 1 --region iad
+
+# 3. Deploy
+fly deploy
+```
+
+Fly prints your public URL (`https://your-unique-name.fly.dev`) when the deploy finishes.
+
+**Important**: this app uses one SQLite file on disk, so it must run as exactly one machine — do not scale it horizontally (`min_machines_running` is already pinned to `1` in `fly.toml`). Note also that calls only use public STUN servers (see below), so a small fraction of users on very restrictive networks may not be able to connect calls to each other, though chat/images/groups are unaffected.
 
 ## Tech stack
 

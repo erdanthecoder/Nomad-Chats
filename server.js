@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { maxAge: '7d' }));
+app.use('/uploads', express.static(path.join(__dirname, 'data', 'uploads'), { maxAge: '7d' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRouter);

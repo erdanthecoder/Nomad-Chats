@@ -1,0 +1,46 @@
+# Fly.io app configuration for NexChat.
+#
+# Before first deploy:
+#   1. Replace `app` below with a globally-unique name (or delete this line
+#      and let `fly launch` fill it in interactively).
+#   2. Create the persistent volume the app expects (same region as below):
+#        fly volumes create nexchat_data --size 1 --region iad
+#   3. Deploy:
+#        fly deploy
+#
+# IMPORTANT: this app uses a single SQLite file on the mounted volume, so it
+# must only ever run as ONE machine. Do not raise min_machines_running or let
+# Fly scale this app horizontally — a second machine would corrupt the DB.
+
+app = "nexchat-app"
+primary_region = "iad"
+
+[build]
+
+[env]
+  PORT = "3000"
+  NODE_ENV = "production"
+
+[[mounts]]
+  source = "nexchat_data"
+  destination = "/app/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "15s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
