@@ -1,7 +1,7 @@
 {
-  "name": "nexchat",
+  "name": "nomad-chats",
   "version": "1.0.0",
-  "description": "NexChat - WhatsApp-style real-time chat app with groups, images and WebRTC voice/video calls",
+  "description": "Nomad Chats - WhatsApp-style real-time chat app with groups, images and WebRTC voice/video calls",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

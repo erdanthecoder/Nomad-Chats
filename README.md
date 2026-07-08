@@ -1,4 +1,4 @@
-# NexChat
+# Nomad Chats
 
 A WhatsApp-style messenger: 1:1 and group chats, image/file sharing, and WebRTC voice/video calls (including group calls). UI available in English and Russian.
 

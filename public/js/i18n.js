@@ -1,6 +1,6 @@
 const I18N = {
   en: {
-    app_name: 'NexChat',
+    app_name: 'Nomad Chats',
     tagline: 'Simple. Secure. Reliable messaging.',
     login: 'Log in',
     register: 'Sign up',
@@ -73,7 +73,7 @@ const I18N = {
     removed: 'removed',
   },
   ru: {
-    app_name: 'NexChat',
+    app_name: 'Nomad Chats',
     tagline: 'Простой. Безопасный. Надёжный мессенджер.',
     login: 'Вход',
     register: 'Регистрация',

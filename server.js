@@ -222,5 +222,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`NexChat server running on http://localhost:${PORT}`);
+  console.log(`Nomad Chats server running on http://localhost:${PORT}`);
 });

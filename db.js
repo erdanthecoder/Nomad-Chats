@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   display_name TEXT NOT NULL,
   avatar_url TEXT,
-  status_text TEXT DEFAULT 'Hey there! I am using NexChat',
+  status_text TEXT DEFAULT 'Hey there! I am using Nomad Chats',
   language TEXT NOT NULL DEFAULT 'en',
   last_seen INTEGER,
   created_at INTEGER NOT NULL
