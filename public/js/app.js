@@ -61,6 +61,7 @@ $all('[data-close-modal]').forEach(btn => {
 // ---------------- BOOTSTRAP ----------------
 
 async function bootstrap() {
+  renderIcons();
   applyI18n();
   try {
     const { user } = await API.me();
@@ -227,9 +228,9 @@ function renderChatList() {
     item.className = 'chat-item' + (conv.id === activeConversationId ? ' active' : '');
     const preview = conv.lastMessage
       ? (conv.lastMessage.type === 'text' ? escapeHtml(conv.lastMessage.content)
-        : conv.lastMessage.type === 'image' ? `📷 ${t('image')}`
-        : conv.lastMessage.type === 'call' ? `📞 ${t('call_ended')}`
-        : `📎 ${escapeHtml(conv.lastMessage.fileName || t('file'))}`)
+        : conv.lastMessage.type === 'image' ? `${iconSvg('image', 14, 'preview-icon')} ${t('image')}`
+        : conv.lastMessage.type === 'call' ? `${iconSvg('phone', 14, 'preview-icon')} ${t('call_ended')}`
+        : `${iconSvg('file', 14, 'preview-icon')} ${escapeHtml(conv.lastMessage.fileName || t('file'))}`)
       : '';
     const online = conv.type === 'direct' && onlineStatus[conv.peer?.id]?.online;
     item.innerHTML = `
@@ -297,7 +298,7 @@ function renderMessageBubble(msg, conv) {
 
   if (msg.type === 'call') {
     el.className = 'call-log-row';
-    el.innerHTML = `<div class="call-log">📞 ${t('call_ended')} · ${formatTime(msg.createdAt)}</div>`;
+    el.innerHTML = `<div class="call-log">${iconSvg('phone', 14, 'preview-icon')} ${t('call_ended')} · ${formatTime(msg.createdAt)}</div>`;
     return el;
   }
 
@@ -308,7 +309,7 @@ function renderMessageBubble(msg, conv) {
   if (msg.type === 'image') {
     inner += `<a href="${msg.fileUrl}" target="_blank"><img class="bubble-image" src="${msg.fileUrl}" alt=""></a>`;
   } else if (msg.type === 'file') {
-    inner += `<a class="bubble-file" href="${msg.fileUrl}" target="_blank" download>📎 ${escapeHtml(msg.fileName || t('file'))}</a>`;
+    inner += `<a class="bubble-file" href="${msg.fileUrl}" target="_blank" download>${iconSvg('paperclip', 16, 'preview-icon')} ${escapeHtml(msg.fileName || t('file'))}</a>`;
   } else {
     inner += `<div class="bubble-text">${escapeHtml(msg.content)}</div>`;
   }
@@ -436,7 +437,7 @@ function renderGroupChips() {
   for (const u of selectedGroupMembers.values()) {
     const chip = document.createElement('div');
     chip.className = 'chip';
-    chip.innerHTML = `${escapeHtml(u.displayName)} <span class="chip-x">✕</span>`;
+    chip.innerHTML = `${escapeHtml(u.displayName)} <span class="chip-x">${iconSvg('x', 12)}</span>`;
     chip.querySelector('.chip-x').addEventListener('click', () => {
       selectedGroupMembers.delete(u.id);
       renderGroupChips();
@@ -574,7 +575,7 @@ function showIncomingCallUI(from, kind, conversationId) {
   actions.innerHTML = '';
   const acceptBtn = document.createElement('button');
   acceptBtn.className = 'call-btn accept';
-  acceptBtn.textContent = '✓';
+  acceptBtn.innerHTML = iconSvg('check', 24);
   acceptBtn.title = t('accept');
   acceptBtn.addEventListener('click', async () => {
     await CallManager.acceptIncoming();
@@ -582,7 +583,7 @@ function showIncomingCallUI(from, kind, conversationId) {
   });
   const declineBtn = document.createElement('button');
   declineBtn.className = 'call-btn decline';
-  declineBtn.textContent = '✕';
+  declineBtn.innerHTML = iconSvg('x', 24);
   declineBtn.title = t('decline');
   declineBtn.addEventListener('click', () => {
     CallManager.declineIncoming();
@@ -598,11 +599,11 @@ function renderActiveCallActions(kind) {
   actions.innerHTML = '';
   const muteBtn = document.createElement('button');
   muteBtn.className = 'call-btn';
-  muteBtn.textContent = '🎤';
+  muteBtn.innerHTML = iconSvg('mic', 22);
   muteBtn.title = t('mute');
   muteBtn.addEventListener('click', () => {
     const muted = CallManager.toggleMute();
-    muteBtn.textContent = muted ? '🔇' : '🎤';
+    muteBtn.innerHTML = iconSvg(muted ? 'micOff' : 'mic', 22);
     muteBtn.title = muted ? t('unmute') : t('mute');
   });
   actions.appendChild(muteBtn);
@@ -610,19 +611,19 @@ function renderActiveCallActions(kind) {
   if (callKind === 'video') {
     const camBtn = document.createElement('button');
     camBtn.className = 'call-btn';
-    camBtn.textContent = '🎥';
+    camBtn.innerHTML = iconSvg('video', 22);
     camBtn.title = t('camera_off');
     camBtn.addEventListener('click', () => {
       const off = CallManager.toggleCamera();
-      camBtn.textContent = off ? '📷' : '🎥';
+      camBtn.innerHTML = iconSvg(off ? 'videoOff' : 'video', 22);
       camBtn.title = off ? t('camera_on') : t('camera_off');
     });
     actions.appendChild(camBtn);
   }
 
   const hangupBtn = document.createElement('button');
-  hangupBtn.className = 'call-btn decline';
-  hangupBtn.textContent = '📵';
+  hangupBtn.className = 'call-btn decline hangup-btn';
+  hangupBtn.innerHTML = iconSvg('phone', 22);
   hangupBtn.title = t('hang_up');
   hangupBtn.addEventListener('click', () => {
     CallManager.hangUp();

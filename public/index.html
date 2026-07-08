@@ -51,9 +51,9 @@
     <div class="sidebar-header">
       <img id="my-avatar" class="avatar avatar-sm" src="" alt="">
       <div class="sidebar-header-actions">
-        <button class="icon-btn" id="btn-new-chat" title="New chat">💬</button>
-        <button class="icon-btn" id="btn-new-group" title="New group">👥</button>
-        <button class="icon-btn" id="btn-profile" title="Profile">⚙️</button>
+        <button class="icon-btn" id="btn-new-chat" title="New chat" data-icon="chat"></button>
+        <button class="icon-btn" id="btn-new-group" title="New group" data-icon="users"></button>
+        <button class="icon-btn" id="btn-profile" title="Profile" data-icon="settings"></button>
         <div class="lang-switch-inline">
           <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
           <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
@@ -68,7 +68,7 @@
 
   <main class="chat-main">
     <div id="empty-state" class="empty-state">
-      <div class="empty-illustration">💬</div>
+      <div class="empty-illustration" data-icon="chat" data-icon-size="72"></div>
       <h2 data-i18n="no_chat_selected">Select a chat to start messaging</h2>
       <p data-i18n="no_chat_sub">Your messages sync across your devices.</p>
     </div>
@@ -81,24 +81,24 @@
           <div id="chat-subtitle" class="chat-subtitle"></div>
         </div>
         <div class="chat-header-actions">
-          <button class="icon-btn" id="btn-voice-call" title="Voice call">📞</button>
-          <button class="icon-btn" id="btn-video-call" title="Video call">🎥</button>
-          <button class="icon-btn" id="btn-chat-info" title="Info">ℹ️</button>
+          <button class="icon-btn" id="btn-voice-call" title="Voice call" data-icon="phone"></button>
+          <button class="icon-btn" id="btn-video-call" title="Video call" data-icon="video"></button>
+          <button class="icon-btn" id="btn-chat-info" title="Info" data-icon="info"></button>
         </div>
       </div>
       <div class="messages" id="messages"></div>
       <form class="composer" id="composer">
-        <button type="button" class="icon-btn" id="btn-attach" title="Attach">📎</button>
+        <button type="button" class="icon-btn" id="btn-attach" title="Attach" data-icon="paperclip"></button>
         <input type="file" id="file-input" accept="image/*,.pdf,.txt,.zip,.doc,.docx" hidden>
         <input type="text" id="message-input" data-i18n-placeholder="type_message" placeholder="Type a message" autocomplete="off">
-        <button type="submit" class="icon-btn send-btn" title="Send">➤</button>
+        <button type="submit" class="icon-btn send-btn" title="Send" data-icon="send"></button>
       </form>
     </div>
   </main>
 
   <aside id="info-panel" class="info-panel hidden">
     <div class="info-panel-header">
-      <button class="icon-btn" id="btn-close-info">✕</button>
+      <button class="icon-btn" id="btn-close-info" data-icon="x"></button>
       <span data-i18n="group_info">Group info</span>
     </div>
     <div class="info-panel-body" id="info-panel-body"></div>
@@ -110,7 +110,7 @@
   <div class="modal-card">
     <div class="modal-header">
       <h3 data-i18n="new_chat">New chat</h3>
-      <button class="icon-btn" data-close-modal>✕</button>
+      <button class="icon-btn" data-close-modal data-icon="x"></button>
     </div>
     <input type="text" id="new-chat-search" data-i18n-placeholder="search_users" placeholder="Search by username…" class="modal-search">
     <div class="user-list" id="new-chat-results"></div>
@@ -122,7 +122,7 @@
   <div class="modal-card">
     <div class="modal-header">
       <h3 data-i18n="new_group">New group</h3>
-      <button class="icon-btn" data-close-modal>✕</button>
+      <button class="icon-btn" data-close-modal data-icon="x"></button>
     </div>
     <input type="text" id="new-group-name" data-i18n-placeholder="group_name" placeholder="Group name" class="modal-search">
     <input type="text" id="new-group-search" data-i18n-placeholder="search_users" placeholder="Search by username…" class="modal-search">
@@ -137,19 +137,19 @@
   <div class="modal-card">
     <div class="modal-header">
       <h3 data-i18n="profile">Profile</h3>
-      <button class="icon-btn" data-close-modal>✕</button>
+      <button class="icon-btn" data-close-modal data-icon="x"></button>
     </div>
     <div class="profile-avatar-row">
       <img id="profile-avatar-preview" class="avatar avatar-lg" src="" alt="">
       <input type="file" id="profile-avatar-input" accept="image/*" hidden>
-      <button class="btn-secondary" id="btn-change-avatar" data-i18n="attach">Change photo</button>
+      <button class="btn-secondary btn-icon-label" id="btn-change-avatar"><span data-icon="camera" data-icon-size="16"></span><span data-i18n="attach">Change photo</span></button>
     </div>
     <label data-i18n="display_name">Your name</label>
     <input type="text" id="profile-displayname" class="modal-search">
     <label data-i18n="status">About</label>
     <input type="text" id="profile-status" class="modal-search">
     <button class="btn-primary" id="btn-save-profile" data-i18n="save">Save</button>
-    <button class="btn-secondary" id="btn-logout" data-i18n="logout">Log out</button>
+    <button class="btn-secondary btn-icon-label" id="btn-logout"><span data-icon="logout" data-icon-size="16"></span><span data-i18n="logout">Log out</span></button>
   </div>
 </div>
 
@@ -167,6 +167,7 @@
 <audio id="ringtone" loop src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="/js/icons.js"></script>
 <script src="/js/i18n.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/webrtc.js"></script>
