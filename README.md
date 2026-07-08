@@ -43,6 +43,18 @@ Fly prints your public URL (`https://your-unique-name.fly.dev`) when the deploy 
 
 **Important**: this app uses one SQLite file on disk, so it must run as exactly one machine — do not scale it horizontally (`min_machines_running` is already pinned to `1` in `fly.toml`). Note also that calls only use public STUN servers (see below), so a small fraction of users on very restrictive networks may not be able to connect calls to each other, though chat/images/groups are unaffected.
 
+## Deploying (Replit)
+
+`.replit` and `replit.nix` are included so the project can be imported and deployed directly:
+
+1. **Import from GitHub**: replit.com → **Create Repl** → **Import from GitHub** → paste this repo's URL.
+2. Click **Run** once to confirm it starts (installs dependencies, starts on port 3000).
+3. Click **Deploy** (Replit's publish step) and choose **Autoscale**.
+
+If publishing still fails, the most common causes are:
+- **Native module build failure** — `better-sqlite3` needs a C++ compiler. `replit.nix` installs `gcc`/`gnumake`/`python3` for this; if Replit ignores it, try **Tools → Shell** → `rm -rf node_modules && npm install` to force a rebuild inside Replit's own environment before deploying.
+- **Data doesn't survive across separate Deployments** — Replit's Autoscale Deployments run in their own filesystem, separate from your workspace; `data/nexchat.db` and `data/uploads/` persist across restarts of that *same* deployment, but a full redeploy can reset them. This mirrors the same tradeoff as Render's free tier, just less often.
+
 ## Tech stack
 
 - **Backend**: Node.js, Express, Socket.io, better-sqlite3, JWT (httpOnly cookie sessions), bcryptjs, multer (uploads)
