@@ -67,8 +67,18 @@ CREATE TABLE IF NOT EXISTS contacts (
   FOREIGN KEY (contact_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  endpoint TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_messages_conv ON messages(conversation_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_members_user ON conversation_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(user_id);
 `);
 
 module.exports = db;

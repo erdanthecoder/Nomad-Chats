@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>Nomad Chats</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%2300a884%22/><text x=%2250%22 y=%2268%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22>N</text></svg>">
+<link rel="icon" href="/icons/icon-32.png">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00a884">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -132,23 +138,46 @@
   </div>
 </div>
 
-<!-- PROFILE MODAL -->
+<!-- SETTINGS MODAL -->
 <div id="modal-profile" class="modal hidden">
-  <div class="modal-card">
+  <div class="modal-card settings-card">
     <div class="modal-header">
-      <h3 data-i18n="profile">Profile</h3>
+      <h3 data-i18n="settings">Settings</h3>
       <button class="icon-btn" data-close-modal data-icon="x"></button>
     </div>
-    <div class="profile-avatar-row">
-      <img id="profile-avatar-preview" class="avatar avatar-lg" src="" alt="">
-      <input type="file" id="profile-avatar-input" accept="image/*" hidden>
-      <button class="btn-secondary btn-icon-label" id="btn-change-avatar"><span data-icon="camera" data-icon-size="16"></span><span data-i18n="attach">Change photo</span></button>
+    <button class="btn-secondary btn-icon-label hidden" id="btn-install-app"><span data-icon="download" data-icon-size="16"></span><span data-i18n="install_app">Install app</span></button>
+    <div class="settings-body">
+      <div class="profile-avatar-row">
+        <img id="profile-avatar-preview" class="avatar avatar-lg" src="" alt="">
+        <input type="file" id="profile-avatar-input" accept="image/*" hidden>
+        <button class="btn-secondary btn-icon-label" id="btn-change-avatar"><span data-icon="camera" data-icon-size="16"></span><span data-i18n="attach">Change photo</span></button>
+      </div>
+      <label data-i18n="display_name">Your name</label>
+      <input type="text" id="profile-displayname" class="modal-search">
+      <label data-i18n="status">About</label>
+      <input type="text" id="profile-status" class="modal-search">
+      <button class="btn-primary" id="btn-save-profile" data-i18n="save">Save</button>
+
+      <div class="settings-section-title" data-i18n="appearance">Appearance</div>
+      <div class="settings-row">
+        <span data-i18n="theme">Theme</span>
+        <div class="theme-switch" id="theme-switch">
+          <button type="button" class="theme-opt" data-theme-choice="light" title="Light"><span data-icon="sun" data-icon-size="16"></span></button>
+          <button type="button" class="theme-opt" data-theme-choice="dark" title="Dark"><span data-icon="moon" data-icon-size="16"></span></button>
+          <button type="button" class="theme-opt" data-theme-choice="system" data-i18n="system_theme">System</button>
+        </div>
+      </div>
+
+      <div class="settings-section-title" data-i18n="notifications">Notifications</div>
+      <div class="settings-row">
+        <span data-i18n="call_message_notifications">Calls &amp; messages</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="notif-toggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <p class="settings-hint" id="notif-hint"></p>
     </div>
-    <label data-i18n="display_name">Your name</label>
-    <input type="text" id="profile-displayname" class="modal-search">
-    <label data-i18n="status">About</label>
-    <input type="text" id="profile-status" class="modal-search">
-    <button class="btn-primary" id="btn-save-profile" data-i18n="save">Save</button>
     <button class="btn-secondary btn-icon-label" id="btn-logout"><span data-icon="logout" data-icon-size="16"></span><span data-i18n="logout">Log out</span></button>
   </div>
 </div>
@@ -171,6 +200,7 @@
 <script src="/js/i18n.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/webrtc.js"></script>
+<script src="/js/push.js"></script>
 <script src="/js/app.js"></script>
 </body>
 </html>

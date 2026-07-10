@@ -10,6 +10,8 @@ const { verifyToken } = require('./auth');
 const { router: authRouter, publicUser } = require('./routes/auth');
 const { router: chatsRouter, conversationSummary, memberIds, isMember } = require('./routes/chats');
 const uploadRouter = require('./routes/upload');
+const pushRouter = require('./routes/push');
+const { sendPushToUser } = require('./push');
 
 const app = express();
 const server = http.createServer(app);
@@ -25,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRouter);
 app.use('/api', chatsRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/push', pushRouter);
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
@@ -122,6 +125,22 @@ io.on('connection', (socket) => {
       };
       io.to(conversationId).emit('message:new', message);
       ack && ack({ message });
+
+      const sender = db.prepare('SELECT display_name FROM users WHERE id = ?').get(userId);
+      const preview = validType === 'text' ? String(content).slice(0, 120)
+        : validType === 'image' ? 'Sent a photo'
+        : `Sent a file: ${fileName || ''}`;
+      for (const uid of memberIds(conversationId)) {
+        if (uid === userId) continue;
+        if (onlineUsers.has(uid)) continue; // already reachable live, skip push to avoid noise
+        sendPushToUser(uid, {
+          title: sender ? sender.display_name : 'New message',
+          body: preview,
+          tag: `msg-${conversationId}`,
+          conversationId,
+          isCall: false
+        });
+      }
     } catch (err) {
       ack && ack({ error: 'Failed to send message' });
     }
@@ -155,6 +174,13 @@ io.on('connection', (socket) => {
         conversationId, callId, kind, from: publicUser(caller), targets
       });
       if (delivered) anyOnline = true;
+      sendPushToUser(uid, {
+        title: `${caller.display_name} is calling`,
+        body: kind === 'video' ? 'Incoming video call' : 'Incoming voice call',
+        tag: `call-${callId}`,
+        conversationId,
+        isCall: true
+      });
     }
     if (!anyOnline) {
       emitToUser(userId, 'call:unavailable', { callId });

@@ -84,6 +84,15 @@ async function enterApp() {
   $('#my-avatar').src = avatarUrl(me);
   connectSocket();
   await loadConversations();
+  Push.init();
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'notification-click' && event.data.conversationId) {
+      openConversation(event.data.conversationId);
+    }
+  });
 }
 
 // ---------------- AUTH ----------------
@@ -494,7 +503,93 @@ $('#btn-profile').addEventListener('click', () => {
   $('#profile-avatar-preview').src = avatarUrl(me);
   $('#profile-displayname').value = me.displayName;
   $('#profile-status').value = me.statusText || '';
+  applyTheme(localStorage.getItem('nomad_theme') || 'system');
+  refreshNotifPanel();
   showModal('#modal-profile');
+});
+
+// ---------------- THEME ----------------
+
+function applyTheme(choice) {
+  if (choice === 'light' || choice === 'dark') {
+    document.documentElement.setAttribute('data-theme', choice);
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  $all('.theme-opt').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.themeChoice === (choice || 'system'));
+  });
+}
+
+$all('.theme-opt').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const choice = btn.dataset.themeChoice;
+    localStorage.setItem('nomad_theme', choice);
+    applyTheme(choice);
+  });
+});
+
+applyTheme(localStorage.getItem('nomad_theme') || 'system');
+
+// ---------------- NOTIFICATIONS ----------------
+
+async function refreshNotifPanel() {
+  const toggle = $('#notif-toggle');
+  const hint = $('#notif-hint');
+  if (!Push.supported) {
+    toggle.checked = false;
+    toggle.disabled = true;
+    hint.textContent = t('notif_unsupported');
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    toggle.checked = false;
+    toggle.disabled = true;
+    hint.textContent = t('notif_denied');
+    return;
+  }
+  toggle.disabled = false;
+  const subscribed = await Push.isSubscribed();
+  toggle.checked = subscribed;
+  hint.textContent = subscribed ? t('notif_on') : t('notif_off');
+}
+
+$('#notif-toggle').addEventListener('change', async (e) => {
+  const enable = e.target.checked;
+  const hint = $('#notif-hint');
+  try {
+    if (enable) {
+      await Push.enable();
+      hint.textContent = t('notif_on');
+    } else {
+      await Push.disable();
+      hint.textContent = t('notif_off');
+    }
+  } catch (err) {
+    e.target.checked = !enable;
+    hint.textContent = err.message || t('notif_enable_error');
+  }
+});
+
+// ---------------- PWA INSTALL ----------------
+
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  $('#btn-install-app').classList.remove('hidden');
+});
+
+$('#btn-install-app').addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  $('#btn-install-app').classList.add('hidden');
+});
+
+window.addEventListener('appinstalled', () => {
+  $('#btn-install-app').classList.add('hidden');
 });
 
 $('#btn-change-avatar').addEventListener('click', () => $('#profile-avatar-input').click());
@@ -580,6 +675,7 @@ function showIncomingCallUI(from, kind, conversationId) {
   acceptBtn.addEventListener('click', async () => {
     await CallManager.acceptIncoming();
     renderActiveCallActions();
+    $('#call-overlay').classList.add('in-call');
   });
   const declineBtn = document.createElement('button');
   declineBtn.className = 'call-btn decline';
@@ -638,6 +734,7 @@ function openCallOverlay(name, avatar, kind, isIncomingRing) {
   $('#call-status').textContent = isIncomingRing ? '' : t('calling');
   $('#call-video-grid').innerHTML = '';
   $('#call-overlay').classList.remove('hidden');
+  $('#call-overlay').classList.remove('in-call');
   $('#call-overlay').classList.toggle('audio-only', kind !== 'video');
   if (!isIncomingRing) renderActiveCallActions(kind);
 }
@@ -650,7 +747,10 @@ function updateCallStatusUI(state) {
     unavailable: t('call_unavailable')
   };
   $('#call-status').textContent = map[state] || '';
-  if (state === 'active') renderActiveCallActions();
+  if (state === 'active') {
+    renderActiveCallActions();
+    $('#call-overlay').classList.add('in-call');
+  }
 }
 
 function setVideoTile(key, stream, isLocal, label) {
