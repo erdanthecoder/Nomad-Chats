@@ -16,6 +16,7 @@ const WAVE_ILLUSTRATION = `<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2
       <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#00332a" flood-opacity="0.25"/>
     </filter>
   </defs>
+  <path d="M0 260 L40 210 L75 240 L120 185 L160 235 L210 195 L250 245 L300 210 L300 340 L0 340 Z" fill="#0a5c4a" opacity="0.16"/>
   <ellipse cx="150" cy="308" rx="70" ry="14" fill="#00332a" opacity="0.15"/>
   <g filter="url(#waveShadow)">
     <rect x="122" y="220" width="22" height="75" rx="11" fill="#2d3f8f"/>
@@ -30,9 +31,12 @@ const WAVE_ILLUSTRATION = `<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2
     </g>
     <rect x="140" y="118" width="20" height="18" rx="8" fill="#f2b787"/>
     <circle cx="150" cy="96" r="32" fill="#f6c79c"/>
-    <path d="M119 90 a31 31 0 0 1 62 0 q-6 -16 -31 -16 q-25 0 -31 16z" fill="#5b3a29"/>
-    <path d="M118 92 q-4 14 4 24 q-2 -18 4 -26z" fill="#5b3a29"/>
-    <path d="M182 92 q4 14 -4 24 q2 -18 -4 -26z" fill="#5b3a29"/>
+    <path d="M120 82 Q120 34 150 26 Q180 34 180 82 Z" fill="#f7f7f5"/>
+    <path d="M150 26 L150 82" stroke="#1c1c1c" stroke-width="1.5" opacity="0.3"/>
+    <path d="M133 29 Q125 55 120 80" fill="none" stroke="#1c1c1c" stroke-width="1" opacity="0.22"/>
+    <path d="M167 29 Q175 55 180 80" fill="none" stroke="#1c1c1c" stroke-width="1" opacity="0.22"/>
+    <rect x="116" y="74" width="68" height="14" rx="5" fill="#1c1c1c"/>
+    <path d="M144 28 l6 -8 l6 8 z" fill="#1c1c1c"/>
     <circle cx="139" cy="98" r="3.4" fill="#00332a"/>
     <circle cx="161" cy="98" r="3.4" fill="#00332a"/>
     <path d="M138 110 q12 9 24 0" stroke="#00332a" stroke-width="2.6" fill="none" stroke-linecap="round"/>

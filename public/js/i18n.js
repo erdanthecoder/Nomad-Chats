@@ -164,6 +164,8 @@ const I18N = {
     cta_button: 'Get started free',
     footer_tagline: 'Simple. Secure. Reliable messaging.',
     footer_rights: 'All rights reserved.',
+    origin_title: 'Why "Nomad"?',
+    origin_body: 'The name draws from Central Asia\'s nomadic peoples — Kyrgyz herders who moved with the seasons across the Tian Shan mountains, staying connected to family and community wherever the trail led. Nomad Chats carries that same spirit: conversations that travel with you, wherever you roam.',
   },
   ru: {
     app_name: 'Nomad Chats',
@@ -330,6 +332,8 @@ const I18N = {
     cta_button: 'Начать бесплатно',
     footer_tagline: 'Простой. Безопасный. Надёжный мессенджер.',
     footer_rights: 'Все права защищены.',
+    origin_title: 'Почему «Nomad»?',
+    origin_body: 'Название вдохновлено кочевыми народами Центральной Азии — киргизскими скотоводами, которые веками перемещались вместе со сменой сезонов по хребтам Тянь-Шаня, оставаясь на связи с семьёй и общиной, куда бы ни вёл путь. Nomad Chats несёт тот же дух: разговоры, которые всегда с вами, где бы вы ни были.',
   }
 };
 

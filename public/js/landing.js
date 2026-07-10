@@ -10,6 +10,7 @@ const HERO_ILLUSTRATION = `<svg viewBox="0 0 420 380" xmlns="http://www.w3.org/2
   </defs>
   <ellipse cx="210" cy="345" rx="120" ry="16" fill="#00332a" opacity="0.15"/>
   <circle cx="210" cy="180" r="160" fill="url(#heroBlob)"/>
+  <path d="M0 300 L50 250 L90 280 L140 220 L200 270 L260 210 L320 265 L380 235 L420 280 L420 380 L0 380 Z" fill="#0a5c4a" opacity="0.18"/>
   <rect x="165" y="270" width="90" height="18" rx="9" fill="#006b56"/>
   <rect x="180" y="286" width="10" height="40" rx="5" fill="#006b56"/>
   <rect x="230" y="286" width="10" height="40" rx="5" fill="#006b56"/>
@@ -20,8 +21,12 @@ const HERO_ILLUSTRATION = `<svg viewBox="0 0 420 380" xmlns="http://www.w3.org/2
     <path d="M182 190 q-20 14 -14 44 q2 10 12 10 q9 0 9 -10 q-3 -22 -7 -44 z" fill="#4a5cc9"/>
     <rect x="200" y="140" width="20" height="20" rx="8" fill="#f2b787"/>
     <circle cx="210" cy="122" r="30" fill="#f6c79c"/>
-    <path d="M180 116 a30 30 0 0 1 60 0 q-30 -14 -60 0z" fill="#00a884"/>
-    <rect x="179" y="112" width="62" height="10" rx="5" fill="#008069"/>
+    <path d="M181 108 Q181 60 210 52 Q239 60 239 108 Z" fill="#f7f7f5"/>
+    <path d="M210 52 L210 108" stroke="#1c1c1c" stroke-width="1.4" opacity="0.3"/>
+    <path d="M195 55 Q188 80 184 106" fill="none" stroke="#1c1c1c" stroke-width="1" opacity="0.22"/>
+    <path d="M225 55 Q232 80 236 106" fill="none" stroke="#1c1c1c" stroke-width="1" opacity="0.22"/>
+    <rect x="177" y="100" width="66" height="13" rx="5" fill="#1c1c1c"/>
+    <path d="M204 54 l6 -8 l6 8 z" fill="#1c1c1c"/>
     <circle cx="200" cy="124" r="3" fill="#00332a"/>
     <circle cx="220" cy="124" r="3" fill="#00332a"/>
     <path d="M201 134 q9 7 18 0" stroke="#00332a" stroke-width="2.4" fill="none" stroke-linecap="round"/>

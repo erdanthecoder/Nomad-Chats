@@ -30,7 +30,8 @@ const ICONS = {
   eyeOff: '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>',
   mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/>',
   dice: '<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.3" fill="currentColor" stroke="none"/>',
-  robot: '<rect x="5" y="9" width="14" height="11" rx="4"/><circle cx="9.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><line x1="12" y1="9" x2="12" y2="5"/><circle cx="12" cy="4" r="1.4" fill="currentColor" stroke="none"/><line x1="2" y1="13" x2="5" y2="13"/><line x1="19" y1="13" x2="22" y2="13"/>'
+  robot: '<rect x="5" y="9" width="14" height="11" rx="4"/><circle cx="9.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><line x1="12" y1="9" x2="12" y2="5"/><circle cx="12" cy="4" r="1.4" fill="currentColor" stroke="none"/><line x1="2" y1="13" x2="5" y2="13"/><line x1="19" y1="13" x2="22" y2="13"/>',
+  mountain: '<path d="M2 20L8 8l4 6 3-5 7 11"/><path d="M7.5 9.5l1 1.5"/><circle cx="18" cy="6" r="2"/>'
 };
 
 function iconSvg(name, size, extraClass) {

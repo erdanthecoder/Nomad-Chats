@@ -149,10 +149,22 @@ p { margin: 0; }
 .step p { color: var(--text-secondary); font-size: 14px; }
 .step-connector { flex: 0 0 60px; height: 2px; background: var(--border); margin-top: 20px; }
 
+.origin-story { padding: 70px 0; background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.origin-inner { max-width: 640px; text-align: center; }
+.origin-icon {
+  width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 18px;
+  background: linear-gradient(135deg, var(--brand-light), var(--brand-dark)); color: white;
+  display: flex; align-items: center; justify-content: center;
+}
+.origin-story h2 { font-size: 24px; font-weight: 800; margin-bottom: 14px; }
+.origin-story p { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+
 /* ---------- CTA BANNER ---------- */
 .cta-banner {
-  background: linear-gradient(160deg, var(--backdrop-1), var(--backdrop-2));
-  color: white; padding: 80px 0;
+  background:
+    url("data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20800%20260%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20preserveAspectRatio%3D%22none%22%3E%20%3Cdefs%3E%20%3ClinearGradient%20id%3D%22mtFar%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230d3b33%22%2F%3E%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230b2b26%22%2F%3E%20%3C%2FlinearGradient%3E%20%3ClinearGradient%20id%3D%22mtNear%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%220%25%22%20y2%3D%22100%25%22%3E%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230a5c4a%22%2F%3E%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23062f2a%22%2F%3E%20%3C%2FlinearGradient%3E%20%3C%2Fdefs%3E%20%3Cpath%20fill%3D%22url(%23mtFar)%22%20opacity%3D%220.65%22%20d%3D%22M0%20190%20L60%20130%20L110%20165%20L170%2090%20L230%20150%20L300%20110%20L360%20170%20L430%20100%20L500%20160%20L560%20120%20L640%20175%20L700%20130%20L800%20185%20L800%20260%20L0%20260%20Z%22%2F%3E%20%3Cpath%20fill%3D%22url(%23mtNear)%22%20d%3D%22M0%20220%20L90%20120%20L150%20165%20L230%2070%20L300%20150%20L380%2095%20L460%20175%20L540%2085%20L610%20160%20L690%20110%20L800%20200%20L800%20260%20L0%20260%20Z%22%2F%3E%20%3Cpath%20fill%3D%22%23ffffff%22%20opacity%3D%220.92%22%20d%3D%22M230%2070%20L214%20100%20L246%20100%20Z%22%2F%3E%20%3Cpath%20fill%3D%22%23ffffff%22%20opacity%3D%220.92%22%20d%3D%22M380%2095%20L364%20122%20L396%20122%20Z%22%2F%3E%20%3Cpath%20fill%3D%22%23ffffff%22%20opacity%3D%220.92%22%20d%3D%22M540%2085%20L522%20116%20L558%20116%20Z%22%2F%3E%20%3Cpath%20fill%3D%22%23ffffff%22%20opacity%3D%220.85%22%20d%3D%22M90%20120%20L76%20145%20L104%20145%20Z%22%2F%3E%20%3C%2Fsvg%3E") bottom / cover no-repeat,
+    linear-gradient(160deg, var(--backdrop-1), var(--backdrop-2));
+  color: white; padding: 80px 0; position: relative;
 }
 .cta-inner { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; }
 .cta-copy h2 { font-size: 30px; font-weight: 800; margin-bottom: 12px; }
