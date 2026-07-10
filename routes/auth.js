@@ -5,6 +5,7 @@ const { v4: uuid } = require('uuid');
 const db = require('../db');
 const { setSessionCookie, clearSessionCookie, requireAuth } = require('../auth');
 const { sendResetCodeEmail } = require('../mailer');
+const { ensureBotConversation } = require('../bot');
 
 const router = express.Router();
 
@@ -17,7 +18,8 @@ function publicUser(u) {
     avatarUrl: u.avatar_url,
     statusText: u.status_text,
     language: u.language,
-    lastSeen: u.last_seen
+    lastSeen: u.last_seen,
+    isBot: !!u.is_bot
   };
 }
 
@@ -58,6 +60,7 @@ router.post('/register', (req, res) => {
   db.prepare(`INSERT INTO users (id, username, password_hash, display_name, email, avatar_url, language, last_seen, created_at)
               VALUES (?, ?, ?, ?, ?, NULL, 'en', ?, ?)`)
     .run(id, username.toLowerCase(), hash, displayName.trim().slice(0, 60), normalizedEmail, now, now);
+  ensureBotConversation(id);
 
   setSessionCookie(res, id);
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
@@ -72,6 +75,7 @@ router.post('/login', (req, res) => {
     return res.status(401).json({ error: 'Invalid username or password' });
   }
   db.prepare('UPDATE users SET last_seen = ? WHERE id = ?').run(Date.now(), user.id);
+  ensureBotConversation(user.id);
   setSessionCookie(res, user.id);
   res.json({ user: meUser(user) });
 });
@@ -85,6 +89,7 @@ router.post('/logout', requireAuth, (req, res) => {
 router.get('/me', requireAuth, (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.userId);
   if (!user) return res.status(401).json({ error: 'Not authenticated' });
+  ensureBotConversation(user.id);
   res.json({ user: meUser(user) });
 });
 
@@ -123,7 +128,7 @@ router.get('/users/search', requireAuth, (req, res) => {
   const q = String(req.query.q || '').trim().toLowerCase();
   if (q.length < 1) return res.json({ users: [] });
   const rows = db.prepare(
-    `SELECT * FROM users WHERE (username LIKE ? OR display_name LIKE ?) AND id != ? LIMIT 20`
+    `SELECT * FROM users WHERE (username LIKE ? OR display_name LIKE ?) AND id != ? AND is_bot = 0 LIMIT 20`
   ).all(`%${q}%`, `%${q}%`, req.userId);
   res.json({ users: rows.map(publicUser) });
 });
