@@ -12,6 +12,7 @@ const { router: chatsRouter, conversationSummary, memberIds, isMember } = requir
 const uploadRouter = require('./routes/upload');
 const pushRouter = require('./routes/push');
 const { sendPushToUser } = require('./push');
+const Bot = require('./bot');
 
 const app = express();
 const server = http.createServer(app);
@@ -128,6 +129,21 @@ io.on('connection', (socket) => {
       };
       io.to(conversationId).emit('message:new', message);
       ack && ack({ message });
+
+      if (Bot.isBotConversation(conversationId)) {
+        const senderUser = db.prepare('SELECT language FROM users WHERE id = ?').get(userId);
+        const botId = Bot.botUserId;
+        io.to(conversationId).emit('conversation:typing', { conversationId, userId: botId, isTyping: true });
+        setTimeout(() => {
+          try {
+            io.to(conversationId).emit('conversation:typing', { conversationId, userId: botId, isTyping: false });
+            const botMessages = Bot.handleBotMessage(conversationId, content, senderUser?.language || 'en');
+            for (const botMsg of botMessages) io.to(conversationId).emit('message:new', botMsg);
+          } catch (err) {
+            console.error('Bot reply failed:', err.message);
+          }
+        }, 550 + Math.random() * 450);
+      }
 
       const sender = db.prepare('SELECT display_name FROM users WHERE id = ?').get(userId);
       const preview = validType === 'text' ? String(content).slice(0, 120)

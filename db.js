@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
   avatar_url TEXT,
   status_text TEXT DEFAULT 'Hey there! I am using Nomad Chats',
   language TEXT NOT NULL DEFAULT 'en',
+  is_bot INTEGER NOT NULL DEFAULT 0,
   last_seen INTEGER,
   created_at INTEGER NOT NULL
 );
@@ -48,7 +49,7 @@ CREATE TABLE IF NOT EXISTS messages (
   id TEXT PRIMARY KEY,
   conversation_id TEXT NOT NULL,
   sender_id TEXT NOT NULL,
-  type TEXT NOT NULL DEFAULT 'text' CHECK(type IN ('text','image','file','call')),
+  type TEXT NOT NULL DEFAULT 'text' CHECK(type IN ('text','image','file','call','game')),
   content TEXT,
   file_url TEXT,
   file_name TEXT,
@@ -100,6 +101,9 @@ CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);
 const userColumns = db.prepare("PRAGMA table_info(users)").all().map(c => c.name);
 if (!userColumns.includes('email')) {
   db.exec('ALTER TABLE users ADD COLUMN email TEXT');
+}
+if (!userColumns.includes('is_bot')) {
+  db.exec('ALTER TABLE users ADD COLUMN is_bot INTEGER NOT NULL DEFAULT 0');
 }
 db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email)');
 

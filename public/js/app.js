@@ -56,6 +56,24 @@ const WAVE_ILLUSTRATION = `<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2
   </g>
 </svg>`;
 
+function launchConfetti(originEl) {
+  const colors = ['#00a884', '#06cf9c', '#5b6ee1', '#ff9f6b', '#ffd700'];
+  const rect = originEl ? originEl.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 3, width: 0, height: 0 };
+  for (let i = 0; i < 28; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = `${rect.left + rect.width / 2}px`;
+    el.style.top = `${rect.top + rect.height / 2}px`;
+    el.style.background = colors[i % colors.length];
+    el.style.setProperty('--dx', `${Math.random() * 300 - 150}px`);
+    el.style.setProperty('--dy', `${Math.random() * 260 + 160}px`);
+    el.style.setProperty('--rot', `${Math.random() * 720 - 360}deg`);
+    el.style.animationDelay = `${Math.random() * 0.15}s`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1400);
+  }
+}
+
 function initials(name) {
   if (!name) return '?';
   return name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase();
@@ -111,6 +129,7 @@ async function bootstrap() {
   renderLogos();
   applyI18n();
   Ringtone.unlockOnFirstInteraction();
+  document.addEventListener('click', () => Effects._ensureCtx(), { once: true });
   const waveSlot = $('#auth-wave-illustration');
   if (waveSlot) waveSlot.innerHTML = WAVE_ILLUSTRATION;
   try {
@@ -328,6 +347,18 @@ function connectSocket() {
       socket.emit('message:read', { conversationId: msg.conversationId });
     }
     bumpConversationPreview(msg);
+
+    if (msg.type === 'game' && msg.senderId !== me.id) {
+      try {
+        const payload = JSON.parse(msg.content);
+        if (payload.kind === 'dice') Effects.playDiceRoll();
+        else if (payload.kind === 'coin') Effects.playCoinFlip();
+        else if (payload.kind === 'guess-win') {
+          Effects.playWinFanfare();
+          if (msg.conversationId === activeConversationId) launchConfetti($('.bubble-row:last-child .bubble'));
+        }
+      } catch {}
+    }
   });
 
   socket.on('conversation:invited', () => loadConversations());
@@ -384,11 +415,20 @@ function bumpConversationPreview(msg) {
 function subtitleFor(conv) {
   if (!conv) return '';
   if (conv.type === 'group') return `${conv.members.length} ${conv.members.length === 1 ? t('member') : t('members')}`;
+  if (conv.peer?.isBot) return t('bot_always_on');
   const status = onlineStatus[conv.peer?.id];
   if (status && status.online) return t('online');
   const lastSeen = status?.lastSeen || conv.peer?.lastSeen;
   if (lastSeen) return `${t('last_seen')} ${formatDay(lastSeen)}`;
   return t('offline');
+}
+
+function gamePreviewText(payload) {
+  if (payload.kind === 'dice') return `${t('game_dice')}: ${payload.value}`;
+  if (payload.kind === 'coin') return `${t('game_coin')}: ${t(payload.value === 'heads' ? 'coin_heads' : 'coin_tails')}`;
+  if (payload.kind === 'rps') return t('game_rps');
+  if (payload.kind === 'guess-win') return t('game_guess_win_short');
+  return t('game_played');
 }
 
 function renderChatList() {
@@ -402,17 +442,23 @@ function renderChatList() {
     const item = document.createElement('div');
     item.className = 'chat-item' + (conv.id === activeConversationId ? ' active' : '');
     item.style.animationDelay = `${Math.min(renderIndex++, 10) * 35}ms`;
-    const preview = conv.lastMessage
-      ? (conv.lastMessage.type === 'text' ? escapeHtml(conv.lastMessage.content)
-        : conv.lastMessage.type === 'image' ? `${iconSvg('image', 14, 'preview-icon')} ${t('image')}`
-        : conv.lastMessage.type === 'call' ? `${iconSvg('phone', 14, 'preview-icon')} ${t('call_ended')}`
-        : `${iconSvg('file', 14, 'preview-icon')} ${escapeHtml(conv.lastMessage.fileName || t('file'))}`)
-      : '';
+    let preview = '';
+    if (conv.lastMessage) {
+      const lm = conv.lastMessage;
+      if (lm.type === 'text') preview = escapeHtml(lm.content);
+      else if (lm.type === 'image') preview = `${iconSvg('image', 14, 'preview-icon')} ${t('image')}`;
+      else if (lm.type === 'call') preview = `${iconSvg('phone', 14, 'preview-icon')} ${t('call_ended')}`;
+      else if (lm.type === 'game') {
+        try { preview = `${iconSvg('dice', 14, 'preview-icon')} ${gamePreviewText(JSON.parse(lm.content))}`; }
+        catch { preview = t('game_played'); }
+      } else preview = `${iconSvg('file', 14, 'preview-icon')} ${escapeHtml(lm.fileName || t('file'))}`;
+    }
     const online = conv.type === 'direct' && onlineStatus[conv.peer?.id]?.online;
     item.innerHTML = `
       <div class="chat-item-avatar">
         <img class="avatar" src="${avatarUrl({ displayName: conv.name, avatarUrl: conv.avatarUrl, id: conv.id })}">
         ${online ? '<span class="online-dot"></span>' : ''}
+        ${conv.peer?.isBot ? `<span class="bot-badge">${iconSvg('check', 9)}</span>` : ''}
       </div>
       <div class="chat-item-body">
         <div class="chat-item-top"><span class="chat-item-name">${escapeHtml(conv.name)}</span><span class="chat-item-time">${conv.lastMessage ? formatDay(conv.lastMessage.createdAt) : ''}</span></div>
@@ -432,7 +478,7 @@ async function openConversation(id) {
   $('#empty-state').classList.add('hidden');
   $('#chat-view').classList.remove('hidden');
   $('#chat-avatar').src = avatarUrl({ displayName: conv.name, avatarUrl: conv.avatarUrl, id: conv.id });
-  $('#chat-title').textContent = conv.name;
+  $('#chat-title').innerHTML = escapeHtml(conv.name) + (conv.peer?.isBot ? `<span class="bot-badge-inline">${iconSvg('check', 9)}</span>` : '');
   $('#chat-subtitle').textContent = subtitleFor(conv);
   conv.unreadCount = 0;
   renderChatList();
@@ -486,6 +532,10 @@ function renderMessageBubble(msg, conv) {
     inner += `<a href="${msg.fileUrl}" target="_blank"><img class="bubble-image" src="${msg.fileUrl}" alt=""></a>`;
   } else if (msg.type === 'file') {
     inner += `<a class="bubble-file" href="${msg.fileUrl}" target="_blank" download>${iconSvg('paperclip', 16, 'preview-icon')} ${escapeHtml(msg.fileName || t('file'))}</a>`;
+  } else if (msg.type === 'game') {
+    let payload = {};
+    try { payload = JSON.parse(msg.content); } catch {}
+    inner += renderGameCard(payload);
   } else {
     inner += `<div class="bubble-text">${escapeHtml(msg.content)}</div>`;
   }
@@ -493,6 +543,56 @@ function renderMessageBubble(msg, conv) {
 
   el.innerHTML = `<div class="bubble">${inner}</div>`;
   return el;
+}
+
+function diceFaceSvg(value, size) {
+  const pipPositions = {
+    1: [[50, 50]],
+    2: [[30, 30], [70, 70]],
+    3: [[30, 30], [50, 50], [70, 70]],
+    4: [[30, 30], [70, 30], [30, 70], [70, 70]],
+    5: [[30, 30], [70, 30], [50, 50], [30, 70], [70, 70]],
+    6: [[30, 25], [70, 25], [30, 50], [70, 50], [30, 75], [70, 75]]
+  };
+  const pips = (pipPositions[value] || []).map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7.5" fill="#5645c9"/>`).join('');
+  return `<svg width="${size}" height="${size}" viewBox="0 0 100 100"><rect x="4" y="4" width="92" height="92" rx="20" fill="#ffffff" stroke="#e9edef" stroke-width="3"/>${pips}</svg>`;
+}
+
+function coinFaceSvg(value, size) {
+  const isHeads = value === 'heads';
+  const c1 = isHeads ? '#ffe27a' : '#e2e6ea';
+  const c2 = isHeads ? '#d4a017' : '#9aa3ad';
+  const label = isHeads ? t('coin_heads_short') : t('coin_tails_short');
+  return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">
+    <defs><linearGradient id="coinGrad${value}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs>
+    <circle cx="50" cy="50" r="44" fill="url(#coinGrad${value})" stroke="#00000022" stroke-width="2"/>
+    <circle cx="50" cy="50" r="34" fill="none" stroke="#ffffff88" stroke-width="2"/>
+    <text x="50" y="60" font-size="26" font-weight="700" text-anchor="middle" fill="#5c4a00">${label}</text>
+  </svg>`;
+}
+
+function renderGameCard(payload) {
+  if (payload.kind === 'dice') {
+    return `<div class="game-card"><div class="game-title">${t('game_dice')}</div>${diceFaceSvg(payload.value, 64)}</div>`;
+  }
+  if (payload.kind === 'coin') {
+    return `<div class="game-card"><div class="game-title">${t('game_coin')}</div>${coinFaceSvg(payload.value, 64)}<div class="game-result">${t(payload.value === 'heads' ? 'coin_heads' : 'coin_tails')}</div></div>`;
+  }
+  if (payload.kind === 'rps') {
+    return `<div class="game-card">
+      <div class="game-title">${t('game_rps')}</div>
+      <div class="rps-row">
+        <span class="rps-choice">${t('you')}<br><b>${t('rps_' + payload.you)}</b></span>
+        <span class="rps-vs">${t('rps_vs')}</span>
+        <span class="rps-choice">${t('bot_name')}<br><b>${t('rps_' + payload.bot)}</b></span>
+      </div>
+      <div class="game-result rps-${payload.result}">${t('rps_' + payload.result)}</div>
+    </div>`;
+  }
+  if (payload.kind === 'guess-win') {
+    return `<div class="game-card celebrate"><div class="game-title">${t('game_guess_win_title')}</div><div class="game-result">${t('game_guess_win').replace('{n}', payload.value).replace('{attempts}', payload.attempts)}</div></div>`;
+  }
+  return '';
 }
 
 // ---------------- COMPOSER ----------------
