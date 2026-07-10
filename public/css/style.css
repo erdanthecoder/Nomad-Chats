@@ -73,11 +73,10 @@ input { font-family: inherit; }
   position: relative;
   z-index: 1;
 }
-.auth-brand { text-align: center; margin-bottom: 8px; }
+.auth-brand { text-align: center; margin-bottom: 8px; text-decoration: none; color: inherit; display: block; }
 .brand-logo {
-  width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, var(--brand-light), var(--brand-dark));
-  color: white; font-size: 30px; font-weight: 700; display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 12px; box-shadow: 0 10px 24px rgba(0,168,132,0.4);
+  width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px; filter: drop-shadow(0 10px 20px rgba(0,168,132,0.4));
 }
 .auth-brand h1 { margin: 0 0 4px; font-size: 24px; }
 .auth-brand p { margin: 0; color: var(--text-secondary); font-size: 13px; }

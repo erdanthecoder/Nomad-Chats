@@ -24,6 +24,9 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'data', 'uploads'), { maxAge: '7d' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
+app.get('/app', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app.html')));
+
 app.use('/api/auth', authRouter);
 app.use('/api', chatsRouter);
 app.use('/api/upload', uploadRouter);

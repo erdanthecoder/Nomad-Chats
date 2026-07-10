@@ -62,6 +62,7 @@ $all('[data-close-modal]').forEach(btn => {
 
 async function bootstrap() {
   renderIcons();
+  renderLogos();
   applyI18n();
   try {
     const { user } = await API.me();

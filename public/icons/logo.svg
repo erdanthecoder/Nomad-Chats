@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06cf9c"/>
+      <stop offset="55%" stop-color="#00a884"/>
+      <stop offset="100%" stop-color="#006b56"/>
+    </linearGradient>
+    <radialGradient id="gloss" cx="30%" cy="18%" r="55%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bubbleBack" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eafff8"/>
+      <stop offset="100%" stop-color="#bdf3e2"/>
+    </linearGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2.2" stdDeviation="2.4" flood-color="#00332a" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="100" height="100" rx="24" fill="url(#bg)"/>
+  <rect x="0" y="0" width="100" height="100" rx="24" fill="url(#gloss)"/>
+
+  <!-- back bubble (second person / group) -->
+  <path filter="url(#softShadow)" fill="url(#bubbleBack)"
+    d="M60 24
+       h20
+       a8 8 0 0 1 8 8
+       v16
+       a8 8 0 0 1 -8 8
+       h-6
+       l0 8
+       l-9 -8
+       h-5
+       a8 8 0 0 1 -8 -8
+       v-16
+       a8 8 0 0 1 8 -8
+       z"/>
+
+  <!-- front bubble (main speech bubble) -->
+  <path filter="url(#softShadow)" fill="#ffffff"
+    d="M22 30
+       h40
+       a10 10 0 0 1 10 10
+       v18
+       a10 10 0 0 1 -10 10
+       h-22
+       l-12 10
+       l1.5 -10
+       h-7.5
+       a10 10 0 0 1 -10 -10
+       v-18
+       a10 10 0 0 1 10 -10
+       z"/>
+
+  <!-- typing dots -->
+  <circle cx="34" cy="49" r="3.6" fill="#00a884"/>
+  <circle cx="46" cy="49" r="3.6" fill="#00a884"/>
+  <circle cx="58" cy="49" r="3.6" fill="#00a884"/>
+</svg>
