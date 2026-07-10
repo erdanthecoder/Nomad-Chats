@@ -139,6 +139,11 @@ input { font-family: inherit; }
 }
 .input-toggle:hover { color: var(--text-primary); }
 .auth-error { color: var(--danger); font-size: 13px; min-height: 16px; }
+.auth-link {
+  background: none; border: none; color: var(--brand-dark); font-size: 13px; font-weight: 600;
+  cursor: pointer; padding: 4px 0; text-align: center; text-decoration: none;
+}
+.auth-link:hover { text-decoration: underline; }
 .btn-primary {
   background: linear-gradient(135deg, var(--brand-light), var(--brand-dark)); color: white; border: none; padding: 12px; border-radius: 8px;
   font-size: 15px; font-weight: 600; transition: filter 0.15s, transform 0.1s;

@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   display_name TEXT NOT NULL,
+  email TEXT,
   avatar_url TEXT,
   status_text TEXT DEFAULT 'Hey there! I am using Nomad Chats',
   language TEXT NOT NULL DEFAULT 'en',
@@ -76,9 +77,30 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS password_resets (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  code_hash TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,
+  used INTEGER NOT NULL DEFAULT 0,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_messages_conv ON messages(conversation_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_members_user ON conversation_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(user_id);
+CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);
 `);
+
+// Migration guard: add columns that may be missing on databases created
+// before this feature existed (fresh databases already have them via the
+// CREATE TABLE above; this only matters for pre-existing data/nexchat.db files).
+const userColumns = db.prepare("PRAGMA table_info(users)").all().map(c => c.name);
+if (!userColumns.includes('email')) {
+  db.exec('ALTER TABLE users ADD COLUMN email TEXT');
+}
+db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email)');
 
 module.exports = db;

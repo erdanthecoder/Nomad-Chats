@@ -33,6 +33,10 @@ const API = {
   updateMe(data) { return this.patch('/api/auth/me', data); },
   searchUsers(q) { return this.get(`/api/auth/users/search?q=${encodeURIComponent(q)}`); },
 
+  requestPasswordReset(email) { return this.post('/api/auth/password-reset/request', { email }); },
+  verifyPasswordResetCode(email, code) { return this.post('/api/auth/password-reset/verify', { email, code }); },
+  confirmPasswordReset(email, code, newPassword) { return this.post('/api/auth/password-reset/confirm', { email, code, newPassword }); },
+
   conversations() { return this.get('/api/conversations'); },
   conversation(id) { return this.get(`/api/conversations/${id}`); },
   createDirect(userId) { return this.post('/api/conversations/direct', { userId }); },
