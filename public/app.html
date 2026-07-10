@@ -17,37 +17,67 @@
 
 <!-- AUTH SCREEN -->
 <div id="auth-screen" class="auth-screen">
-  <div class="auth-card">
-    <a href="/" class="auth-brand" aria-label="Nomad Chats home">
-      <div class="brand-logo" data-logo="56"></div>
-      <h1 data-i18n="app_name">Nomad Chats</h1>
-      <p data-i18n="tagline">Simple. Secure. Reliable messaging.</p>
-    </a>
+  <div class="auth-shell">
 
-    <div class="auth-lang-switch">
-      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+    <div class="auth-illustration-panel">
+      <a href="/" class="auth-illu-logo" aria-label="Nomad Chats home" data-logo="44"></a>
+      <div class="auth-illu-art" id="auth-wave-illustration"></div>
+      <h2 data-i18n="auth_welcome_title">Welcome to Nomad Chats</h2>
+      <p data-i18n="auth_welcome_sub">Real-time messaging, group chats, and video calls — all in one place, wherever you roam.</p>
     </div>
 
-    <div class="auth-tabs">
-      <button id="tab-login" class="auth-tab active" data-i18n="login">Log in</button>
-      <button id="tab-register" class="auth-tab" data-i18n="register">Sign up</button>
+    <div class="auth-form-panel">
+      <div class="auth-card">
+        <a href="/" class="auth-brand auth-brand-mobile" aria-label="Nomad Chats home">
+          <div class="brand-logo" data-logo="56"></div>
+          <h1 data-i18n="app_name">Nomad Chats</h1>
+          <p data-i18n="tagline">Simple. Secure. Reliable messaging.</p>
+        </a>
+
+        <div class="auth-lang-switch">
+          <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+          <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+        </div>
+
+        <div class="auth-tabs">
+          <button id="tab-login" class="auth-tab active" data-i18n="login">Log in</button>
+          <button id="tab-register" class="auth-tab" data-i18n="register">Sign up</button>
+        </div>
+
+        <form id="login-form" class="auth-form">
+          <div class="input-group">
+            <span class="input-icon" data-icon="user" data-icon-size="16"></span>
+            <input type="text" id="login-username" data-i18n-placeholder="username" placeholder="Username" autocomplete="username" required>
+          </div>
+          <div class="input-group">
+            <span class="input-icon" data-icon="lock" data-icon-size="16"></span>
+            <input type="password" id="login-password" data-i18n-placeholder="password" placeholder="Password" autocomplete="current-password" required>
+            <button type="button" class="input-toggle" id="login-password-toggle" data-icon="eye" data-icon-size="16" aria-label="Show password"></button>
+          </div>
+          <div class="auth-error" id="login-error"></div>
+          <button type="submit" class="btn-primary" data-i18n="login_cta">Log in</button>
+        </form>
+
+        <form id="register-form" class="auth-form hidden">
+          <div class="input-group">
+            <span class="input-icon" data-icon="user" data-icon-size="16"></span>
+            <input type="text" id="register-displayname" data-i18n-placeholder="display_name" placeholder="Your name" autocomplete="name" required>
+          </div>
+          <div class="input-group">
+            <span class="input-icon" data-icon="user" data-icon-size="16"></span>
+            <input type="text" id="register-username" data-i18n-placeholder="username" placeholder="Username" autocomplete="username" required>
+          </div>
+          <div class="input-group">
+            <span class="input-icon" data-icon="lock" data-icon-size="16"></span>
+            <input type="password" id="register-password" data-i18n-placeholder="password" placeholder="Password" autocomplete="new-password" required>
+            <button type="button" class="input-toggle" id="register-password-toggle" data-icon="eye" data-icon-size="16" aria-label="Show password"></button>
+          </div>
+          <div class="auth-error" id="register-error"></div>
+          <button type="submit" class="btn-primary" data-i18n="register_cta">Create account</button>
+        </form>
+      </div>
     </div>
 
-    <form id="login-form" class="auth-form">
-      <input type="text" id="login-username" data-i18n-placeholder="username" placeholder="Username" autocomplete="username" required>
-      <input type="password" id="login-password" data-i18n-placeholder="password" placeholder="Password" autocomplete="current-password" required>
-      <div class="auth-error" id="login-error"></div>
-      <button type="submit" class="btn-primary" data-i18n="login_cta">Log in</button>
-    </form>
-
-    <form id="register-form" class="auth-form hidden">
-      <input type="text" id="register-displayname" data-i18n-placeholder="display_name" placeholder="Your name" autocomplete="name" required>
-      <input type="text" id="register-username" data-i18n-placeholder="username" placeholder="Username" autocomplete="username" required>
-      <input type="password" id="register-password" data-i18n-placeholder="password" placeholder="Password" autocomplete="new-password" required>
-      <div class="auth-error" id="register-error"></div>
-      <button type="submit" class="btn-primary" data-i18n="register_cta">Create account</button>
-    </form>
   </div>
 </div>
 
