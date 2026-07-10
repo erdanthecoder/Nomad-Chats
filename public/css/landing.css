@@ -79,8 +79,19 @@ p { margin: 0; }
     radial-gradient(circle at -10% 60%, rgba(0,168,132,0.10), transparent 50%),
     var(--bg-page);
   overflow: hidden;
+  position: relative;
+}
+.hero-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(6,207,156,0.22), transparent 70%); }
+.particle.p1 { width: 160px; height: 160px; top: 8%; left: 6%; animation: particle-drift 15s ease-in-out infinite; }
+.particle.p2 { width: 100px; height: 100px; top: 62%; left: 88%; animation: particle-drift 19s ease-in-out infinite reverse; }
+.particle.p3 { width: 70px; height: 70px; top: 82%; left: 22%; animation: particle-drift 11s ease-in-out infinite; }
+@keyframes particle-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(32px, -26px); }
 }
 .hero-inner {
+  position: relative; z-index: 1;
   max-width: 1120px; margin: 0 auto; padding: 80px 24px 60px;
   display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center;
 }
