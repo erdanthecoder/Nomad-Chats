@@ -172,6 +172,103 @@ function wirePasswordToggle(toggleId, inputId) {
 }
 wirePasswordToggle('#login-password-toggle', '#login-password');
 wirePasswordToggle('#register-password-toggle', '#register-password');
+wirePasswordToggle('#forgot-new-password-toggle', '#forgot-new-password');
+
+// ---------------- FORGOT PASSWORD ----------------
+
+let resetFlowEmail = '';
+let resetFlowCode = '';
+
+function showForgotStep(step) {
+  ['email', 'code', 'newpassword', 'done'].forEach(s => {
+    $(`#forgot-step-${s}`).classList.toggle('hidden', s !== step);
+  });
+}
+
+$('#btn-forgot-password').addEventListener('click', () => {
+  resetFlowEmail = '';
+  resetFlowCode = '';
+  $('#forgot-email').value = $('#login-username').value.includes('@') ? $('#login-username').value : '';
+  $('#forgot-code').value = '';
+  $('#forgot-new-password').value = '';
+  $('#forgot-confirm-password').value = '';
+  ['#forgot-email-error', '#forgot-code-error', '#forgot-password-error'].forEach(id => $(id).textContent = '');
+  showForgotStep('email');
+  showModal('#modal-forgot-password');
+});
+
+$('#btn-send-reset-code').addEventListener('click', async () => {
+  const email = $('#forgot-email').value.trim();
+  const errEl = $('#forgot-email-error');
+  errEl.textContent = '';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = t('enter_valid_email');
+    return;
+  }
+  try {
+    await API.requestPasswordReset(email);
+    resetFlowEmail = email;
+    $('#forgot-code').value = '';
+    $('#forgot-code-error').textContent = '';
+    showForgotStep('code');
+  } catch (err) {
+    errEl.textContent = err.message || t('error_generic');
+  }
+});
+
+$('#btn-verify-reset-code').addEventListener('click', async () => {
+  const code = $('#forgot-code').value.trim();
+  const errEl = $('#forgot-code-error');
+  errEl.textContent = '';
+  if (!/^\d{6}$/.test(code)) {
+    errEl.textContent = t('enter_valid_code');
+    return;
+  }
+  try {
+    await API.verifyPasswordResetCode(resetFlowEmail, code);
+    resetFlowCode = code;
+    $('#forgot-new-password').value = '';
+    $('#forgot-confirm-password').value = '';
+    $('#forgot-password-error').textContent = '';
+    showForgotStep('newpassword');
+  } catch (err) {
+    errEl.textContent = err.message || t('error_generic');
+  }
+});
+
+$('#btn-resend-code').addEventListener('click', async () => {
+  const errEl = $('#forgot-code-error');
+  errEl.textContent = '';
+  try {
+    await API.requestPasswordReset(resetFlowEmail);
+    errEl.style.color = 'var(--brand-dark)';
+    errEl.textContent = t('resend_code_sent');
+  } catch (err) {
+    errEl.style.color = '';
+    errEl.textContent = err.message || t('error_generic');
+  }
+});
+
+$('#btn-confirm-reset-password').addEventListener('click', async () => {
+  const newPassword = $('#forgot-new-password').value;
+  const confirmPassword = $('#forgot-confirm-password').value;
+  const errEl = $('#forgot-password-error');
+  errEl.textContent = '';
+  if (newPassword.length < 6) {
+    errEl.textContent = t('password_too_short');
+    return;
+  }
+  if (newPassword !== confirmPassword) {
+    errEl.textContent = t('passwords_dont_match');
+    return;
+  }
+  try {
+    await API.confirmPasswordReset(resetFlowEmail, resetFlowCode, newPassword);
+    showForgotStep('done');
+  } catch (err) {
+    errEl.textContent = err.message || t('error_generic');
+  }
+});
 
 $('#login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -196,6 +293,7 @@ $('#register-form').addEventListener('submit', async (e) => {
     const { user } = await API.register({
       displayName: $('#register-displayname').value.trim(),
       username: $('#register-username').value.trim(),
+      email: $('#register-email').value.trim(),
       password: $('#register-password').value
     });
     me = user;
@@ -576,6 +674,8 @@ $('#btn-profile').addEventListener('click', () => {
   $('#profile-avatar-preview').src = avatarUrl(me);
   $('#profile-displayname').value = me.displayName;
   $('#profile-status').value = me.statusText || '';
+  $('#profile-email').value = me.email || '';
+  $('#profile-email-error').textContent = '';
   applyTheme(localStorage.getItem('nomad_theme') || 'system');
   refreshNotifPanel();
   showModal('#modal-profile');
@@ -677,14 +777,20 @@ $('#profile-avatar-input').addEventListener('change', async (e) => {
 });
 
 $('#btn-save-profile').addEventListener('click', async () => {
-  const { user } = await API.updateMe({
-    displayName: $('#profile-displayname').value.trim(),
-    statusText: $('#profile-status').value.trim(),
-    avatarUrl: me._pendingAvatar || undefined
-  });
-  me = user;
-  $('#my-avatar').src = avatarUrl(me);
-  hideModal('#modal-profile');
+  $('#profile-email-error').textContent = '';
+  try {
+    const { user } = await API.updateMe({
+      displayName: $('#profile-displayname').value.trim(),
+      statusText: $('#profile-status').value.trim(),
+      avatarUrl: me._pendingAvatar || undefined,
+      email: $('#profile-email').value.trim()
+    });
+    me = user;
+    $('#my-avatar').src = avatarUrl(me);
+    hideModal('#modal-profile');
+  } catch (err) {
+    $('#profile-email-error').textContent = err.message || t('error_generic');
+  }
 });
 
 // language switch persists to server for logged-in user

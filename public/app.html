@@ -56,6 +56,7 @@
           </div>
           <div class="auth-error" id="login-error"></div>
           <button type="submit" class="btn-primary" data-i18n="login_cta">Log in</button>
+          <button type="button" class="auth-link" id="btn-forgot-password" data-i18n="forgot_password">Forgot password?</button>
         </form>
 
         <form id="register-form" class="auth-form hidden">
@@ -68,6 +69,10 @@
             <input type="text" id="register-username" data-i18n-placeholder="username" placeholder="Username" autocomplete="username" required>
           </div>
           <div class="input-group">
+            <span class="input-icon" data-icon="mail" data-icon-size="16"></span>
+            <input type="email" id="register-email" data-i18n-placeholder="email" placeholder="Email" autocomplete="email" required>
+          </div>
+          <div class="input-group">
             <span class="input-icon" data-icon="lock" data-icon-size="16"></span>
             <input type="password" id="register-password" data-i18n-placeholder="password" placeholder="Password" autocomplete="new-password" required>
             <button type="button" class="input-toggle" id="register-password-toggle" data-icon="eye" data-icon-size="16" aria-label="Show password"></button>
@@ -78,6 +83,57 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="modal-forgot-password" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 data-i18n="reset_password_title">Reset your password</h3>
+      <button class="icon-btn" data-close-modal data-icon="x"></button>
+    </div>
+
+    <div id="forgot-step-email">
+      <p class="settings-hint" data-i18n="reset_step_email_hint">Enter the email on your account and we'll send you a code.</p>
+      <div class="input-group">
+        <span class="input-icon" data-icon="mail" data-icon-size="16"></span>
+        <input type="email" id="forgot-email" data-i18n-placeholder="email" placeholder="Email" autocomplete="email">
+      </div>
+      <div class="auth-error" id="forgot-email-error"></div>
+      <button type="button" class="btn-primary" id="btn-send-reset-code" data-i18n="send_code">Send code</button>
+    </div>
+
+    <div id="forgot-step-code" class="hidden">
+      <p class="settings-hint" id="forgot-code-hint" data-i18n="reset_step_code_hint">Enter the 6-digit code we sent to your email.</p>
+      <div class="input-group">
+        <span class="input-icon" data-icon="lock" data-icon-size="16"></span>
+        <input type="text" id="forgot-code" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code">
+      </div>
+      <div class="auth-error" id="forgot-code-error"></div>
+      <button type="button" class="btn-primary" id="btn-verify-reset-code" data-i18n="verify_code">Verify code</button>
+      <button type="button" class="btn-secondary" id="btn-resend-code" data-i18n="resend_code">Resend code</button>
+    </div>
+
+    <div id="forgot-step-newpassword" class="hidden">
+      <p class="settings-hint" data-i18n="reset_step_password_hint">Choose a new password for your account.</p>
+      <div class="input-group">
+        <span class="input-icon" data-icon="lock" data-icon-size="16"></span>
+        <input type="password" id="forgot-new-password" data-i18n-placeholder="new_password" placeholder="New password" autocomplete="new-password">
+        <button type="button" class="input-toggle" id="forgot-new-password-toggle" data-icon="eye" data-icon-size="16" aria-label="Show password"></button>
+      </div>
+      <div class="input-group">
+        <span class="input-icon" data-icon="lock" data-icon-size="16"></span>
+        <input type="password" id="forgot-confirm-password" data-i18n-placeholder="confirm_password" placeholder="Confirm password" autocomplete="new-password">
+      </div>
+      <div class="auth-error" id="forgot-password-error"></div>
+      <button type="button" class="btn-primary" id="btn-confirm-reset-password" data-i18n="reset_password_cta">Reset password</button>
+    </div>
+
+    <div id="forgot-step-done" class="hidden">
+      <p class="settings-hint" data-i18n="reset_done_hint">Your password has been reset. You can now log in with your new password.</p>
+      <button type="button" class="btn-primary" data-close-modal data-i18n="back_to_login">Back to log in</button>
+    </div>
   </div>
 </div>
 
@@ -186,6 +242,9 @@
       <input type="text" id="profile-displayname" class="modal-search">
       <label data-i18n="status">About</label>
       <input type="text" id="profile-status" class="modal-search">
+      <label data-i18n="email">Email</label>
+      <input type="email" id="profile-email" class="modal-search" data-i18n-placeholder="email_optional_hint" placeholder="Used for password reset">
+      <div class="auth-error" id="profile-email-error"></div>
       <button class="btn-primary" id="btn-save-profile" data-i18n="save">Save</button>
 
       <div class="settings-section-title" data-i18n="appearance">Appearance</div>
