@@ -8,7 +8,7 @@ A WhatsApp-style messenger: 1:1 and group chats, image/file sharing, and WebRTC 
 - **Direct & group chats** — real-time messaging over Socket.io, typing indicators, online/last-seen presence, unread counts.
 - **Groups** — create groups, add/remove members, admin roles, group avatar/name.
 - **Media sharing** — send images and files (PDF, docs, zip, txt) in any chat.
-- **Calls** — WebRTC voice and video calls, 1:1 and full-mesh group calls, signaled over Socket.io (STUN only, no external TURN service configured).
+- **Calls** — WebRTC voice and video calls, 1:1 and full-mesh group calls, signaled over Socket.io (STUN by default; set `TURN_*` env vars for reliable calls on restrictive networks — see "Notes on calls" below).
 - **Languages** — English and Russian, switchable from the login screen or inside the app; each user's choice is saved to their profile.
 
 ## Running locally
@@ -41,7 +41,7 @@ fly deploy
 
 Fly prints your public URL (`https://your-unique-name.fly.dev`) when the deploy finishes.
 
-**Important**: this app uses one SQLite file on disk, so it must run as exactly one machine — do not scale it horizontally (`min_machines_running` is already pinned to `1` in `fly.toml`). Note also that calls only use public STUN servers (see below), so a small fraction of users on very restrictive networks may not be able to connect calls to each other, though chat/images/groups are unaffected.
+**Important**: this app uses one SQLite file on disk, so it must run as exactly one machine — do not scale it horizontally (`min_machines_running` is already pinned to `1` in `fly.toml`). Also set the `TURN_*` secrets (see "Notes on calls" below) if you want calls to reliably connect for users on restrictive networks — without them, a small fraction of users may not be able to connect calls to each other, though chat/images/groups are unaffected.
 
 ## Deploying (Replit)
 
@@ -81,4 +81,18 @@ public/
 
 ## Notes on calls
 
-Calls use only public STUN servers for NAT traversal. On restrictive corporate/mobile networks that block peer-to-peer UDP, a TURN relay would be needed — none is configured here since it typically requires a paid or self-hosted relay service.
+Calls use public STUN servers for NAT traversal by default, which is enough for most home WiFi and mobile connections. On restrictive corporate/school networks or symmetric-NAT mobile carriers, a **TURN relay** is required — STUN alone can't establish a path there, and the call will just hang on "Calling…".
+
+To enable TURN, set these three environment variables (Fly.io: `fly secrets set NAME=value`; Replit: the Secrets tab) and redeploy — no code changes needed:
+
+```
+TURN_URLS=turn:your-turn-host:3478,turns:your-turn-host:5349
+TURN_USERNAME=your-turn-username
+TURN_CREDENTIAL=your-turn-password
+```
+
+The server exposes these at `/api/ice-servers` and the client fetches them automatically; when unset, it silently falls back to STUN-only.
+
+Options for getting a TURN server:
+- **Managed** (fastest to set up): Twilio Network Traversal Service, Cloudflare Realtime TURN, Metered.ca (has a free tier), or Xirsys — each gives you a URL + username + credential to drop into the env vars above.
+- **Self-hosted**: run [coturn](https://github.com/coturn/coturn) on a small VM with a static IP and open UDP port range — cheaper at scale but more to maintain.

@@ -1,7 +1,21 @@
-const ICE_SERVERS = [
+const DEFAULT_ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' }
 ];
+
+let iceServersCache = null;
+async function loadIceServers() {
+  if (iceServersCache) return iceServersCache;
+  try {
+    const res = await fetch('/api/ice-servers', { credentials: 'include' });
+    if (!res.ok) throw new Error('bad status');
+    const data = await res.json();
+    iceServersCache = (data.iceServers && data.iceServers.length) ? data.iceServers : DEFAULT_ICE_SERVERS;
+  } catch {
+    iceServersCache = DEFAULT_ICE_SERVERS;
+  }
+  return iceServersCache;
+}
 
 const CallManager = {
   socket: null,
@@ -35,6 +49,8 @@ const CallManager = {
       this.callbacks.onUnavailable && this.callbacks.onUnavailable();
       this._teardown();
     });
+
+    loadIceServers();
   },
 
   async startCall(conversationId, kind, targetUserIds) {
@@ -116,9 +132,10 @@ const CallManager = {
     return this.myUserId > otherUserId;
   },
 
-  _getOrCreatePeer(otherUserId) {
+  async _getOrCreatePeer(otherUserId) {
     if (this.peers[otherUserId]) return this.peers[otherUserId].pc;
-    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+    const iceServers = await loadIceServers();
+    const pc = new RTCPeerConnection({ iceServers });
     this.peers[otherUserId] = { pc, stream: null };
 
     if (this.localStream) {
@@ -156,7 +173,7 @@ const CallManager = {
 
     if (this.peers[userId]) return; // already connecting
     if (this._shouldOffer(userId)) {
-      const pc = this._getOrCreatePeer(userId);
+      const pc = await this._getOrCreatePeer(userId);
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       this.socket.emit('call:offer', {
@@ -169,7 +186,7 @@ const CallManager = {
   async _onOffer({ callId, fromUserId, sdp }) {
     if (callId !== this.callId) return;
     if (!this.isActive) return; // must have accepted already
-    const pc = this._getOrCreatePeer(fromUserId);
+    const pc = await this._getOrCreatePeer(fromUserId);
     await pc.setRemoteDescription(new RTCSessionDescription(sdp));
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);

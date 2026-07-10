@@ -11,6 +11,7 @@ const { router: authRouter, publicUser } = require('./routes/auth');
 const { router: chatsRouter, conversationSummary, memberIds, isMember } = require('./routes/chats');
 const uploadRouter = require('./routes/upload');
 const pushRouter = require('./routes/push');
+const iceRouter = require('./routes/ice');
 const { sendPushToUser } = require('./push');
 const Bot = require('./bot');
 
@@ -32,6 +33,7 @@ app.use('/api/auth', authRouter);
 app.use('/api', chatsRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/push', pushRouter);
+app.use('/api', iceRouter);
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
