@@ -2,6 +2,10 @@ const I18N = {
   en: {
     app_name: 'Nomad Chats',
     tagline: 'Simple. Secure. Reliable messaging.',
+    auth_welcome_title: 'Welcome to Nomad Chats',
+    auth_welcome_sub: 'Real-time messaging, group chats, and video calls — all in one place, wherever you roam.',
+    show_password: 'Show password',
+    hide_password: 'Hide password',
     login: 'Log in',
     register: 'Sign up',
     username: 'Username',
@@ -122,6 +126,10 @@ const I18N = {
   ru: {
     app_name: 'Nomad Chats',
     tagline: 'Простой. Безопасный. Надёжный мессенджер.',
+    auth_welcome_title: 'Добро пожаловать в Nomad Chats',
+    auth_welcome_sub: 'Мгновенные сообщения, групповые чаты и видеозвонки — всё в одном месте, где бы вы ни были.',
+    show_password: 'Показать пароль',
+    hide_password: 'Скрыть пароль',
     login: 'Вход',
     register: 'Регистрация',
     username: 'Имя пользователя',

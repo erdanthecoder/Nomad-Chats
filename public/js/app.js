@@ -10,6 +10,52 @@ let onlineStatus = {}; // userId -> {online, lastSeen}
 const $ = (sel) => document.querySelector(sel);
 const $all = (sel) => document.querySelectorAll(sel);
 
+const WAVE_ILLUSTRATION = `<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="waveShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#00332a" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <ellipse cx="150" cy="308" rx="70" ry="14" fill="#00332a" opacity="0.15"/>
+  <g filter="url(#waveShadow)">
+    <rect x="122" y="220" width="22" height="75" rx="11" fill="#2d3f8f"/>
+    <rect x="156" y="220" width="22" height="75" rx="11" fill="#263578"/>
+    <rect x="116" y="288" width="34" height="14" rx="7" fill="#182229"/>
+    <rect x="150" y="288" width="34" height="14" rx="7" fill="#182229"/>
+    <path d="M110 150 q0 -20 40 -20 q40 0 40 20 v75 q0 16 -40 16 q-40 0 -40 -16 z" fill="#06cf9c"/>
+    <path d="M112 156 q-22 8 -20 42 q1 12 12 12 q11 0 11 -12 q-2 -22 -3 -42 z" fill="#00a884"/>
+    <g class="wave-arm">
+      <path d="M188 156 q28 -6 34 -40 q2 -12 -9 -15 q-11 -3 -14 8 q-5 20 -19 30 z" fill="#00a884"/>
+      <circle cx="216" cy="98" r="13" fill="#f6c79c"/>
+    </g>
+    <rect x="140" y="118" width="20" height="18" rx="8" fill="#f2b787"/>
+    <circle cx="150" cy="96" r="32" fill="#f6c79c"/>
+    <path d="M119 90 a31 31 0 0 1 62 0 q-6 -16 -31 -16 q-25 0 -31 16z" fill="#5b3a29"/>
+    <path d="M118 92 q-4 14 4 24 q-2 -18 4 -26z" fill="#5b3a29"/>
+    <path d="M182 92 q4 14 -4 24 q2 -18 -4 -26z" fill="#5b3a29"/>
+    <circle cx="139" cy="98" r="3.4" fill="#00332a"/>
+    <circle cx="161" cy="98" r="3.4" fill="#00332a"/>
+    <path d="M138 110 q12 9 24 0" stroke="#00332a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <circle cx="127" cy="104" r="5" fill="#ff9f83" opacity="0.55"/>
+    <circle cx="173" cy="104" r="5" fill="#ff9f83" opacity="0.55"/>
+  </g>
+  <g class="wave-lines" stroke="#00a884" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8">
+    <path d="M234 68 q8 -4 8 -12"/>
+    <path d="M244 82 q10 -1 12 -8"/>
+    <path d="M240 98 q11 3 16 -2"/>
+  </g>
+  <g class="float-a">
+    <path filter="url(#waveShadow)" fill="#ffffff" d="M40 130 h40 a11 11 0 0 1 11 11 v20 a11 11 0 0 1 -11 11 h-22 l-13 11 l1.6 -11 h-6.6 a11 11 0 0 1 -11 -11 v-20 a11 11 0 0 1 11 -11 z"/>
+    <circle cx="55" cy="151" r="2.8" fill="#00a884"/>
+    <circle cx="65" cy="151" r="2.8" fill="#00a884"/>
+    <circle cx="75" cy="151" r="2.8" fill="#00a884"/>
+  </g>
+  <g class="float-b">
+    <circle cx="248" cy="200" r="18" fill="#ffffff" filter="url(#waveShadow)"/>
+    <path d="M241 200 l5 5 l11 -11" stroke="#00a884" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>`;
+
 function initials(name) {
   if (!name) return '?';
   return name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join('').toUpperCase();
@@ -64,6 +110,8 @@ async function bootstrap() {
   renderIcons();
   renderLogos();
   applyI18n();
+  const waveSlot = $('#auth-wave-illustration');
+  if (waveSlot) waveSlot.innerHTML = WAVE_ILLUSTRATION;
   try {
     const { user } = await API.me();
     me = user;
@@ -110,6 +158,19 @@ $('#tab-register').addEventListener('click', () => {
   $('#register-form').classList.remove('hidden');
   $('#login-form').classList.add('hidden');
 });
+
+function wirePasswordToggle(toggleId, inputId) {
+  const toggle = $(toggleId);
+  const input = $(inputId);
+  toggle.addEventListener('click', () => {
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    toggle.innerHTML = iconSvg(showing ? 'eye' : 'eyeOff', 16);
+    toggle.setAttribute('aria-label', showing ? t('show_password') : t('hide_password'));
+  });
+}
+wirePasswordToggle('#login-password-toggle', '#login-password');
+wirePasswordToggle('#register-password-toggle', '#register-password');
 
 $('#login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
