@@ -70,11 +70,13 @@ const DUO_ILLUSTRATION = `<svg viewBox="0 0 360 220" xmlns="http://www.w3.org/20
     <path d="M220 195 q0 -32 30 -32 q30 0 30 32 z" fill="#006b56"/>
     <rect x="224" y="110" width="52" height="72" rx="22" fill="#06cf9c"/>
     <path d="M224 122 q-22 6 -20 34 q1 10 12 10 q10 0 9 -10 z" fill="#00a884"/>
-    <circle cx="250" cy="88" r="24" fill="#e8ab7a"/>
-    <path d="M226 84 q24 -20 48 0 q0 -22 -24 -22 q-24 0 -24 22z" fill="#3a2b23"/>
-    <circle cx="242" cy="90" r="2.6" fill="#00332a"/>
-    <circle cx="258" cy="90" r="2.6" fill="#00332a"/>
-    <path d="M242 98 q8 6 16 0" stroke="#00332a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M247 131 q3 11 0 17 q-3 -6 0 -17z M253 131 q-3 11 0 17 q3 -6 0 -17z" fill="#f4c430"/>
+    <circle cx="250" cy="129" r="3.4" fill="#f4c430"/>
+    <circle cx="250" cy="85" r="28" fill="#e8ab7a"/>
+    <ellipse cx="240" cy="72" rx="10" ry="6" fill="#ffffff" opacity="0.22"/>
+    <circle cx="240" cy="88" r="2.6" fill="#00332a"/>
+    <circle cx="260" cy="88" r="2.6" fill="#00332a"/>
+    <path d="M240 97 q10 7 20 0" stroke="#00332a" stroke-width="2" fill="none" stroke-linecap="round"/>
   </g>
   <g filter="url(#duoShadow)" class="float-a">
     <path fill="#ffffff" d="M140 40 h80 a16 16 0 0 1 16 16 v28 a16 16 0 0 1 -16 16 h-20 l-16 14 l2 -14 h-44 a16 16 0 0 1 -16 -16 v-28 a16 16 0 0 1 16 -16 z"/>

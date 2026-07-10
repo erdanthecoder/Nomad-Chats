@@ -110,6 +110,7 @@ async function bootstrap() {
   renderIcons();
   renderLogos();
   applyI18n();
+  Ringtone.unlockOnFirstInteraction();
   const waveSlot = $('#auth-wave-illustration');
   if (waveSlot) waveSlot.innerHTML = WAVE_ILLUSTRATION;
   try {
@@ -235,7 +236,11 @@ function connectSocket() {
 
   socket.on('conversation:typing', ({ conversationId, userId, isTyping }) => {
     if (conversationId !== activeConversationId || userId === me.id) return;
-    $('#chat-subtitle').textContent = isTyping ? t('typing') : subtitleFor(getConversation(conversationId));
+    if (isTyping) {
+      $('#chat-subtitle').innerHTML = `<span class="typing-indicator" title="${t('typing')}"><span></span><span></span><span></span></span>`;
+    } else {
+      $('#chat-subtitle').textContent = subtitleFor(getConversation(conversationId));
+    }
   });
 
   socket.on('presence:update', ({ userId, online, lastSeen }) => {
@@ -293,10 +298,12 @@ function renderChatList() {
   const list = $('#chat-list');
   list.innerHTML = '';
   const sorted = [...conversations].sort((a, b) => b.updatedAt - a.updatedAt);
+  let renderIndex = 0;
   for (const conv of sorted) {
     if (q && !conv.name.toLowerCase().includes(q)) continue;
     const item = document.createElement('div');
     item.className = 'chat-item' + (conv.id === activeConversationId ? ' active' : '');
+    item.style.animationDelay = `${Math.min(renderIndex++, 10) * 35}ms`;
     const preview = conv.lastMessage
       ? (conv.lastMessage.type === 'text' ? escapeHtml(conv.lastMessage.content)
         : conv.lastMessage.type === 'image' ? `${iconSvg('image', 14, 'preview-icon')} ${t('image')}`
@@ -402,6 +409,10 @@ $('#composer').addEventListener('submit', (e) => {
   });
   input.value = '';
   socket.emit('conversation:typing', { conversationId: activeConversationId, isTyping: false });
+  const sendBtn = $('.send-btn');
+  sendBtn.classList.remove('sent');
+  void sendBtn.offsetWidth;
+  sendBtn.classList.add('sent');
 });
 
 $('#message-input').addEventListener('input', () => {
@@ -735,6 +746,7 @@ function showIncomingCallUI(from, kind, conversationId) {
   acceptBtn.innerHTML = iconSvg('check', 24);
   acceptBtn.title = t('accept');
   acceptBtn.addEventListener('click', async () => {
+    Ringtone.stop();
     await CallManager.acceptIncoming();
     renderActiveCallActions();
     $('#call-overlay').classList.add('in-call');
@@ -744,6 +756,7 @@ function showIncomingCallUI(from, kind, conversationId) {
   declineBtn.innerHTML = iconSvg('x', 24);
   declineBtn.title = t('decline');
   declineBtn.addEventListener('click', () => {
+    Ringtone.stop();
     CallManager.declineIncoming();
     closeCallOverlay();
   });
@@ -784,6 +797,7 @@ function renderActiveCallActions(kind) {
   hangupBtn.innerHTML = iconSvg('phone', 22);
   hangupBtn.title = t('hang_up');
   hangupBtn.addEventListener('click', () => {
+    Ringtone.stop();
     CallManager.hangUp();
     closeCallOverlay();
   });
@@ -799,6 +813,7 @@ function openCallOverlay(name, avatar, kind, isIncomingRing) {
   $('#call-overlay').classList.remove('in-call');
   $('#call-overlay').classList.toggle('audio-only', kind !== 'video');
   if (!isIncomingRing) renderActiveCallActions(kind);
+  Ringtone.start();
 }
 
 function updateCallStatusUI(state) {
@@ -809,6 +824,7 @@ function updateCallStatusUI(state) {
     unavailable: t('call_unavailable')
   };
   $('#call-status').textContent = map[state] || '';
+  if (state !== 'calling') Ringtone.stop();
   if (state === 'active') {
     renderActiveCallActions();
     $('#call-overlay').classList.add('in-call');
@@ -837,6 +853,7 @@ function setVideoTile(key, stream, isLocal, label) {
   const video = tile.querySelector('video');
   video.srcObject = stream;
   $('#call-status').textContent = '';
+  if (!isLocal) Ringtone.stop();
 }
 
 function removeVideoTile(key) {
@@ -845,6 +862,7 @@ function removeVideoTile(key) {
 }
 
 function closeCallOverlay() {
+  Ringtone.stop();
   $('#call-overlay').classList.add('hidden');
   $('#call-video-grid').innerHTML = '';
   $('#call-actions').innerHTML = '';
